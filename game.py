@@ -78,13 +78,13 @@ class player(Sprite):
 		platform_hit_list = pygame.sprite.spritecollide(self, self.platforms, False)
 		self.rect.y -= 1.3
 		if len(platform_hit_list) > 0 or self.rect.bottom >= 850:
-			self.ySpeed = -10
+			self.ySpeed = -9
 	
 	def go_left(self):
-		self.xSpeed = -6
+		self.xSpeed = -4
 	
 	def go_right(self):
-		self.xSpeed = 6
+		self.xSpeed = 4
 	
 	def stop(self):
 		self.xSpeed = 0
@@ -144,6 +144,8 @@ def main():
 		platformList.draw(screen)
 		activeList.update()
 		activeList.draw(screen)
+		stickList.update()
+		stickList.draw(screen)
 		clock.tick(60)
 		pygame.display.flip()
 	pygame.quit()
