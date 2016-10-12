@@ -44,16 +44,22 @@ class player(Sprite):
 		self.ySpeed = 0
 		self.platforms = platforms
 		self.sticks = sticks
+		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 
 	def update(self):
 		self.calc_grav()
-		self.rect.x += self.xSpeed
+		move = self._sliding()
+		if move > 4:
+			move = 4
+		self.rect.x += move
+
 		block_hit_list = pygame.sprite.spritecollide(self, self.platforms, False)
 		for block in block_hit_list:
 			if self.xSpeed > 0:
 				self.rect.right = block.rect.left
 			elif self.xSpeed < 0:
 				self.rect.left = block.rect.right
+			self.xSpeed = 0
 
 		self.rect.y += self.ySpeed
 		block_hit_list = pygame.sprite.spritecollide(self, self.platforms, False)
@@ -81,13 +87,37 @@ class player(Sprite):
 			self.ySpeed = -9
 	
 	def go_left(self):
-		self.xSpeed = -4
+		self.direction = -1
 	
 	def go_right(self):
-		self.xSpeed = 4
+		self.direction = 1
 	
 	def stop(self):
-		self.xSpeed = 0
+		self.direction = 0
+
+	def _sliding(self):
+		slidingRatio = 0.15
+		maxSpeed = 2
+		if self.direction != 0 and (self.xSpeed == maxSpeed or self.xSpeed == -maxSpeed):
+			return self.xSpeed
+		if self.direction == -1:
+			if self.xSpeed > 0:
+				self.xSpeed = 0
+			self.xSpeed -= slidingRatio
+			return self.xSpeed
+		elif self.direction == 1:
+			if self.xSpeed < 0:
+				self.xSpeed = 0
+			self.xSpeed += slidingRatio
+			return self.xSpeed
+		else:
+			if self.xSpeed > 0.1:
+				self.xSpeed -= slidingRatio
+			elif self.xSpeed < 0.1:
+				self.xSpeed += slidingRatio
+			else:
+				self.xSpeed = 0
+			return self.xSpeed
 
 def main():
 	pygame.init()
@@ -111,7 +141,7 @@ def main():
 
 	Player = player(platforms = platformList, sticks = stickList)
 
-	Player.rect.x = 30
+	Player.rect.x = 700
 	Player.rect.y = 500
 	plat.player = Player
 	platformList.add(plat)
