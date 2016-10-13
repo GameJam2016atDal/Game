@@ -1,184 +1,71 @@
-#!/Users/Cheng/Developer/Python/PyGame/venv/bin/python
-import pygame, os
-#from pygame.locals import *
-from pygame.sprite import Sprite
-from pygame.image import load
+import pygame
+from Platform import platform
+from Player import player
 
-BGCOLOUR = (249, 250, 255)
+class game:
+	def __init__(self, screenSize, fullScreen = False, backgroundColour = (249, 250, 255)):
+		pygame.init()
+		self._bgColour = backgroundColour
+		self.screenSize = screenSize
+		self.screen = pygame.display.set_mode(screenSize, fullScreen)
+		self.screen.fill(self._bgColour)
+		self.playerList = None
+		self._generatePlatform()
+		self._generateSticks()
 
-class platform(Sprite):
-	def __init__(self, img):
-		super().__init__()
-		self.image = load(os.getcwd() + '/img/' + img + '.png')
-		self.rect = self.image.get_rect()
+	def _generatePlatform(self):
+		self.platformList = pygame.sprite.Group()
+		plats = platform.generatePlatforms()
+		for plat in plats:
+			self.platformList.add(plat)
 
-	@staticmethod
-	def generatePlatforms():
-		imgs = ['platform1', 'layer2_l', 'layer2', 'pillar_l', 'pillar_r', 'shortStage', 'shortStage', 'shortStage', 'shortStage', 'topStage', 'topStage']
-		coordinates = [(0, 800), (270, 690), (780, 690), (270, 700), (1100, 700), (300, 500), (840, 500), (300, 350), (840, 350), (170, 200), (780, 200)]
-		platFormList = list()
-		for (eachImg, eachCoordinate) in zip(imgs, coordinates):
-			plat = platform(img = eachImg)
-			plat.rect.x, plat.rect.y = eachCoordinate
-			platFormList.append(plat)
-		return platFormList
+	def _generateSticks(self):
+		self.stickList = pygame.sprite.Group()
+		sticks = platform.generateSticks()
+		for stick in sticks:
+			self.stickList.add(stick)
 
-	@staticmethod
-	def generateSticks():
-		imgs = ['sticks', 'sticks', 'bottomSticks']
-		coordinates = [(0, 690), (1330, 690), (350, 720)]
-		stickList = list()
-		for (eachImg, eachCoordinate) in zip(imgs, coordinates):
-			stick = platform(img = eachImg)
-			stick.rect.x, stick.rect.y = eachCoordinate
-			stickList.append(stick)
-		return stickList
+	def addPlayer(self):
+		self.Player = player(platforms = self.platformList, sticks = self.stickList)
+		initialLocation = (700, 500)
+		self.Player.rect.x, self.Player.rect.y = initialLocation
+		if self.playerList is None:
+			self.playerList = pygame.sprite.Group()
+		self.playerList.add(self.Player)
 
-class player(Sprite):
-	def __init__(self, platforms, sticks):
-		super().__init__()
-		self.image = pygame.Surface([50, 100])
-		self.image.fill((0, 255, 0))
-		self.rect = self.image.get_rect()
-		self.xSpeed = 0
-		self.ySpeed = 0
-		self.platforms = platforms
-		self.sticks = sticks
-		self.direction = 0 # 0 for stop, 1 for right, -1 for left
-
-	def update(self):
-		self.calc_grav()
-		move = self._sliding()
-		if move > 4:
-			move = 4
-		self.rect.x += move
-
-		block_hit_list = pygame.sprite.spritecollide(self, self.platforms, False)
-		for block in block_hit_list:
-			if self.xSpeed > 0:
-				self.rect.right = block.rect.left
-			elif self.xSpeed < 0:
-				self.rect.left = block.rect.right
-			self.xSpeed = 0
-
-		self.rect.y += self.ySpeed
-		block_hit_list = pygame.sprite.spritecollide(self, self.platforms, False)
-		for block in block_hit_list:
-			if self.ySpeed > 0:
-				self.rect.bottom = block.rect.top
-			elif self.ySpeed < 0:
-				self.rect.top = block.rect.bottom
-			self.ySpeed = 0
-	
-	def calc_grav(self):
-		if self.ySpeed == 0:
-			self.ySpeed = 1
-		else:
-			self.ySpeed += .35	
-		if self.rect.y >= 850 - self.rect.height and self.ySpeed >= 0:
-			self.ySpeed = 0
-			self.rect.y = 850 - self.rect.height
-
-	def jump(self):
-		self.rect.y += 1.3
-		platform_hit_list = pygame.sprite.spritecollide(self, self.platforms, False)
-		self.rect.y -= 1.3
-		if len(platform_hit_list) > 0 or self.rect.bottom >= 850:
-			self.ySpeed = -9
-	
-	def go_left(self):
-		self.direction = -1
-	
-	def go_right(self):
-		self.direction = 1
-	
-	def stop(self):
-		self.direction = 0
-
-	def _sliding(self):
-		slidingRatio = 0.15
-		maxSpeed = 2
-		if self.direction != 0 and (self.xSpeed == maxSpeed or self.xSpeed == -maxSpeed):
-			return self.xSpeed
-		if self.direction == -1:
-			if self.xSpeed > 0:
-				self.xSpeed = 0
-			self.xSpeed -= slidingRatio
-			return self.xSpeed
-		elif self.direction == 1:
-			if self.xSpeed < 0:
-				self.xSpeed = 0
-			self.xSpeed += slidingRatio
-			return self.xSpeed
-		else:
-			if self.xSpeed > 0.1:
-				self.xSpeed -= slidingRatio
-			elif self.xSpeed < 0.1:
-				self.xSpeed += slidingRatio
-			else:
-				self.xSpeed = 0
-			return self.xSpeed
-
-def main():
-	pygame.init()
-	screenSize = (1440, 850)
-	fullScreen = False
-	screen = pygame.display.set_mode(screenSize, fullScreen)
-	cwd = os.getcwd()
-	screen.fill(BGCOLOUR)
-
-	platformList = pygame.sprite.Group()
-	plats = platform.generatePlatforms()
-	for plat in plats:
-		platformList.add(plat)
-	platformList.draw(screen)
-
-	stickList = pygame.sprite.Group()
-	sticks = platform.generateSticks()
-	for stick in sticks:
-		stickList.add(stick)
-	stickList.draw(screen)
-
-	Player = player(platforms = platformList, sticks = stickList)
-
-	Player.rect.x = 700
-	Player.rect.y = 500
-	plat.player = Player
-	platformList.add(plat)
-	activeList = pygame.sprite.Group()
-	activeList.add(Player)
-	clock = pygame.time.Clock()
-	gaming = True
-
-	while gaming:
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				gaming = False
-				break
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_ESCAPE:
-					gaming = False
-					break
-				if event.key == pygame.K_LEFT:
-					Player.go_left()
-				if event.key == pygame.K_RIGHT:
-					Player.go_right()
-				if event.key == pygame.K_UP:
-					Player.jump()
-			if event.type == pygame.KEYUP:
-				if event.key == pygame.K_LEFT and Player.xSpeed < 0:
-					Player.stop()
-				if event.key == pygame.K_RIGHT and Player.xSpeed > 0:
-					Player.stop()
-		screen.fill(BGCOLOUR)
-		platformList.draw(screen)
-		activeList.update()
-		activeList.draw(screen)
-		stickList.update()
-		stickList.draw(screen)
-		clock.tick(60)
+	def _update(self):
+		self.screen.fill(self._bgColour)
+		self.platformList.update()
+		self.platformList.draw(self.screen)
+		self.playerList.update()
+		self.playerList.draw(self.screen)
+		self.stickList.update()
+		self.stickList.draw(self.screen)
 		pygame.display.flip()
-	pygame.quit()
 
-if __name__ == '__main__':
-	main()
+	def start(self):
+		clock = pygame.time.Clock()
+		self.gaming = True
+		while self.gaming:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					self.gaming = False
+					break
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_ESCAPE:
+						self.gaming = False
+						break
+					if event.key == pygame.K_LEFT:
+						self.Player.go_left()
+					if event.key == pygame.K_RIGHT:
+						self.Player.go_right()
+					if event.key == pygame.K_UP:
+						self.Player.jump()
+				if event.type == pygame.KEYUP:
+					if event.key == pygame.K_LEFT and self.Player.xSpeed < 0:
+						self.Player.stop()
+					if event.key == pygame.K_RIGHT and self.Player.xSpeed > 0:
+						self.Player.stop()
+			clock.tick(60)
+			self._update()
+		pygame.quit()
