@@ -1,18 +1,22 @@
 from pygame.sprite import Sprite
 from pygame.image import load
+from Bullet import Bullet
 import os
 
-class Grenade(Sprite):
+class Grenade(Bullet):
 
     initial_y = None
     initial_x = None
 
     def __init__(self, direction):
-        super().__init__()
+        super().__init__(direction)
         self.image = load(os.getcwd() + '/img/grenade.png')
         self.rect = self.image.get_rect()
-        self.speed = 2
+        self.speed = 6
         self.direction = direction#1 for right, -1 for left
+
+    def bounce(self):
+        print("success")
 
     def move(self):
         if not self.initial_y:

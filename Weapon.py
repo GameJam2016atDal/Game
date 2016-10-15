@@ -13,7 +13,6 @@ class Weapon(Sprite):
 		self.rect = self.image.get_rect()
 		self.direction = direction
 		self.shootingBullets = set()
-		self.shootingGrenades = set()
 
 	@staticmethod
 	def grenade_launcher(direction):
@@ -44,10 +43,10 @@ class Weapon(Sprite):
 		grenade = Grenade(self.direction)
 		grenade.rect.x, grenade.rect.y = self.rect.x, self.rect.y
 		if self.direction > 0:
-			grenade.rect.left = self.rect.right
+			grenade.rect.left = self.rect.right+20
 		else:
 			grenade.rect.right = self.rect.left
-		self.shootingGrenades.add(grenade)
+		self.shootingBullets.add(grenade)
 		return grenade
 
 
@@ -56,7 +55,7 @@ class grenade_launcher(Weapon):
 		super().__init__(image = "grenade", direction = direction)
 
 	def shoot(self):
-		if len(self.shootingGrenades) < 3:
+		if len(self.shootingBullets) < 3:
 			return super().launch()
 
 	def changeDirection(self, direction):
