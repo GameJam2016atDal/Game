@@ -15,7 +15,7 @@ class player(Sprite):
 		self.sticks = sticks
 		self.weakLayer = weakLayer
 		self.hp = 100
-		self.weapon = Weapon.machineGun(direction = -1)
+		self.weapon = Weapon.baseballBat(direction = 1)
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 
 	def update(self):
@@ -68,12 +68,12 @@ class player(Sprite):
 			elif self.xSpeed < 0:
 				self.rect.left = each.rect.right
 			self.xSpeed = 0
-	
+
 	def calc_grav(self):
 		if self.ySpeed == 0:
 			self.ySpeed = 1
 		else:
-			self.ySpeed += .35	
+			self.ySpeed += .35
 		if self.rect.y >= 850 - self.rect.height and self.ySpeed >= 0:
 			self.ySpeed = 0
 			self.rect.y = 850 - self.rect.height
@@ -86,13 +86,13 @@ class player(Sprite):
 		self.rect.y -= 1.3
 		if len(platform_hit_list) > 0 or len(weakLayer_list) > 0 or len(elevator_list) > 0:
 			self.ySpeed = -9
-	
+
 	def go_left(self):
 		self.direction = -1
-	
+
 	def go_right(self):
 		self.direction = 1
-	
+
 	def stop(self):
 		self.direction = 0
 
