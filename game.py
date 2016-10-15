@@ -52,16 +52,26 @@ class game:
 		self.weakLayerGroup.add(self.weakLayer)
 
 	def addPlayer(self):
-		Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList)
+		# Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList)
+		# initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
+		# initialLocation = initialLocations[randint(0, 3)]
+		# Player.rect.x, Player.rect.y = initialLocation
+		# Player.weapon.rect.x, Player.weapon.rect.y = initialLocation
+		# if self.playerList is None:
+		# 	self.playerList = pygame.sprite.Group()
+		# self.playerList.add(Player)
+		# self.playerList.add(Player.weapon)
+		# return Player
+
+		self.Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList)
 		initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
 		initialLocation = initialLocations[randint(0, 3)]
-		Player.rect.x, Player.rect.y = initialLocation
-		Player.weapon.rect.x, Player.weapon.rect.y = initialLocation
+		self.Player.rect.x, self.Player.rect.y = initialLocation
+		self.Player.weapon.rect.x, self.Player.weapon.rect.y = initialLocation
 		if self.playerList is None:
 			self.playerList = pygame.sprite.Group()
-		self.playerList.add(Player)
-		self.playerList.add(Player.weapon)
-		return Player
+		self.playerList.add(self.Player)
+		self.playerList.add(self.Player.weapon)
 
 	def _update(self):
 		self.screen.fill(self._bgColour)
@@ -113,45 +123,44 @@ class game:
 		self.socket.listen(10)
 		clock = pygame.time.Clock()
 		self.gaming = True
-		self.begin = False
-		addressSet = set()
-		playerCount = 0
-		while self.begin != True:
-			client, addr = self.socket.accept()
-			if not client is None and not (addr in addressSet):
-				addressSet.add(addr)
-				player = self.addPlayer()
-				playerCount += 1
-				thread = ClientThread(client, player, self.bulletList)
-				thread.start()
-			print(playerCount)
-			if playerCount == 1:
-				self.begin = True
+		# self.begin = False
+		# addressSet = set()
+		# playerCount = 0
+		# while self.begin != True:
+		# 	client, addr = self.socket.accept()
+		# 	if not client is None and not (addr in addressSet):
+		# 		addressSet.add(addr)
+		# 		player = self.addPlayer()
+		# 		playerCount += 1
+		# 		thread = ClientThread(client, player, self.bulletList)
+		# 		thread.start()
+		# 	print(playerCount)
+		# 	if playerCount == 1:
+		# 		self.begin = True
 		while self.gaming:
-			# for event in pygame.event.get():
-			# 	if event.type == pygame.QUIT:
-			# 		self.gaming = False
-			# 		break
-			# 	if event.type == pygame.KEYDOWN:
-			# 		if event.key == pygame.K_ESCAPE:
-			# 			self.gaming = False
-			# 			break
-			# 		if event.key == pygame.K_LEFT:
-			# 			self.Player.go_left()
-			# 		if event.key == pygame.K_RIGHT:
-			# 			self.Player.go_right()
-			# 		if event.key == pygame.K_UP:
-			# 			self.Player.jump()
-			# 		if event.key == pygame.K_SPACE:
-			# 			bullet = self.Player.weapon.shoot()
-			# 			if not bullet is None:
-			# 				self.bulletList.add(bullet)
-			# 	if event.type == pygame.KEYUP:
-			# 		if event.key == pygame.K_LEFT and self.Player.xSpeed < 0:
-			# 			self.Player.stop()
-			# 		if event.key == pygame.K_RIGHT and self.Player.xSpeed > 0:
-			# 			self.Player.stop()
->>>>>>> 60bf57cc83fb1c274eb5fc230b58537d0cdc1240
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					self.gaming = False
+					break
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_ESCAPE:
+						self.gaming = False
+						break
+					if event.key == pygame.K_LEFT:
+						self.Player.go_left()
+					if event.key == pygame.K_RIGHT:
+						self.Player.go_right()
+					if event.key == pygame.K_UP:
+						self.Player.jump()
+					if event.key == pygame.K_SPACE:
+						bullet = self.Player.weapon.shoot()
+						if not bullet is None:
+							self.bulletList.add(bullet)
+				if event.type == pygame.KEYUP:
+					if event.key == pygame.K_LEFT and self.Player.xSpeed < 0:
+						self.Player.stop()
+					if event.key == pygame.K_RIGHT and self.Player.xSpeed > 0:
+						self.Player.stop()
 			clock.tick(60)
 			self._update()
 		pygame.quit()
