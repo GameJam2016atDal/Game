@@ -44,9 +44,12 @@ class game:
 		self.Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, sticks = self.stickList)
 		initialLocation = (700, 500)
 		self.Player.rect.x, self.Player.rect.y = initialLocation
+		self.Player.weapon.rect.x, self.Player.weapon.rect.y = initialLocation
 		if self.playerList is None:
 			self.playerList = pygame.sprite.Group()
 		self.playerList.add(self.Player)
+		self.playerList.add(self.Player.weapon)
+		self.playerList.add(self.Player.weapon.shootingBullets)
 
 	def _update(self):
 		self.screen.fill(self._bgColour)
@@ -82,6 +85,8 @@ class game:
 						self.Player.go_right()
 					if event.key == pygame.K_UP:
 						self.Player.jump()
+					if event.key == pygame.K_SPACE:
+						self.Player.weapon.shoot()
 				if event.type == pygame.KEYUP:
 					if event.key == pygame.K_LEFT and self.Player.xSpeed < 0:
 						self.Player.stop()

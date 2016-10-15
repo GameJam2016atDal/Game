@@ -1,5 +1,6 @@
 from pygame.sprite import Sprite, spritecollide
 from pygame import Surface
+from Weapon import *
 
 class player(Sprite):
 	def __init__(self, platforms, elevator, weakLayer, sticks):
@@ -14,6 +15,7 @@ class player(Sprite):
 		self.sticks = sticks
 		self.weakLayer = weakLayer
 		self.hp = 100
+		self.weapon = Weapon.machineGun(direction = -1)
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 
 	def update(self):
@@ -24,6 +26,9 @@ class player(Sprite):
 		elif move < -4:
 			move = -4
 		self.rect.x += move
+		self.weapon.rect.x, self.weapon.rect.y = self.rect.x - 5, self.rect.y - 5
+		self.weapon.rect.x += move
+		self.weapon.update()
 
 		block_hit_list = spritecollide(self, self.platforms, False)
 		self._preventMoving(block_hit_list)
