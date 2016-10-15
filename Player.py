@@ -15,7 +15,7 @@ class player(Sprite):
 		self.sticks = sticks
 		self.weakLayer = weakLayer
 		self.hp = 100
-		self.weapon = Weapon.baseballBat(direction = 1)
+		self.weapon = Weapon.machineGun(direction = 1)
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 
 	def update(self):
@@ -26,7 +26,7 @@ class player(Sprite):
 		elif move < -4:
 			move = -4
 		self.rect.x += move
-		self.weapon.rect.x, self.weapon.rect.y = self.rect.x - 5, self.rect.y - 5
+		self.weapon.rect.x, self.weapon.rect.y = self.rect.x, self.rect.y
 		self.weapon.rect.x += move
 		self.weapon.update()
 
@@ -89,9 +89,11 @@ class player(Sprite):
 
 	def go_left(self):
 		self.direction = -1
+		self.weapon.changeDirection(self.direction)
 
 	def go_right(self):
 		self.direction = 1
+		self.weapon.changeDirection(self.direction)
 
 	def stop(self):
 		self.direction = 0
