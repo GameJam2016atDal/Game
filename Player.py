@@ -2,6 +2,7 @@ from pygame.sprite import Sprite, spritecollide
 from pygame import Surface
 from pygame.time import get_ticks
 from Weapon import *
+from random import randint
 
 class player(Sprite):
 	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks):
@@ -25,9 +26,20 @@ class player(Sprite):
 	def update(self):
 		if not self.start_tick is None:
 			currentTime = get_ticks()
-			if (currentTime - self.start_tick) / 1000 > 1:
-				self.unhurtful = False
-				self.image.fill((0, 255, 0))
+			if self.hp > 0:
+				if (currentTime - self.start_tick) / 1000 > 1:
+					self.unhurtful = False
+					self.image.fill((0, 255, 0))
+			else:
+				if (currentTime - self.start_tick) / 1000 > 5:
+					initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
+					initialLocation = initialLocations[randint(0, 3)]
+					self.rect.x, self.rect.y = initialLocation
+					self.hp = 100
+				else:
+					self.rect.x, self.rect.y = (-100, -100)
+					self.weapon.rect.x, self.weapon.rect.y = (-100, -100)
+					return
 		self.calc_grav()
 		if self.rect.right > 1440:
 			self.rect.right = 1440
@@ -68,7 +80,12 @@ class player(Sprite):
 				self.start_tick = get_ticks()
 				self.image.fill((0, 0, 0))
 				self.hp -= 10
-				self.unhurtful = True
+				if self.hp <= 0:
+					#Dead
+					self.rect.x, self.rect.y = -100, -100
+					self.weapon.rect.x, self.weapon.rect.y = (-100, -100)
+				else:
+					self.unhurtful = True
 
 		bullet_hit_list = spritecollide(self, self.bulletList, False)
 		for each in bullet_hit_list:
@@ -76,8 +93,12 @@ class player(Sprite):
 				self.start_tick = get_ticks()
 				self.image.fill((0, 0, 0))
 				self.hp -= 20
-				self.unhurtful = True
-
+				if self.hp <= 0:
+					#Dead
+					self.rect.x, self.rect.y = -100, -100
+					self.weapon.rect.x, self.weapon.rect.y = (-100, -100)
+				else:
+					self.unhurtful = True
 
 		elevator_hit_list = spritecollide(self, self.elevator, False)
 		for each in elevator_hit_list:
