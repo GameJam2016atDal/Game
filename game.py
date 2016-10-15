@@ -17,6 +17,7 @@ class game:
 		self._generateElevators()
 		self._generateWeakLayer()
 		self.bulletList = pygame.sprite.Group()
+		self.grenadeList = pygame.sprite.Group()
 
 	def _generatePlatform(self):
 		self.platformList = pygame.sprite.Group()
@@ -57,6 +58,12 @@ class game:
 		self.platformList.draw(self.screen)
 		self.elevatorList.update()
 		self.elevatorList.draw(self.screen)
+		for each in self.grenadeList:
+			each.move()
+			if each.rect.right >= 1440 or each.rect.left <= 0:
+				self.grenadeList.remove(each)
+				self.Player.weapon.shootingGrenades.remove(each)
+
 		for each in self.elevators:
 			each.move()
 		for each in self.bulletList:
@@ -65,14 +72,20 @@ class game:
 			elevator_hit_list = pygame.sprite.spritecollide(each, self.elevatorList, False)
 			if len(block_hit_list) > 0 or len(elevator_hit_list) > 0:
 				self.bulletList.remove(each)
-				self.Player.weapon.shootingBullets.remove(each)
+				try:
+					self.Player.weapon.shootingBullets.remove(each)
+				except Exception as e:
+					pass
 
 			if each.rect.right >= 1440 or each.rect.left <= 0:
 				print('Touch screen')
 				self.bulletList.remove(each)
 				self.Player.weapon.shootingBullets.remove(each)
+
 		self.bulletList.update()
 		self.bulletList.draw(self.screen)
+		self.grenadeList.update()
+		self.grenadeList.draw(self.screen)
 		self.playerList.update()
 		self.playerList.draw(self.screen)
 		self.stickList.update()
@@ -99,6 +112,10 @@ class game:
 						self.Player.go_right()
 					if event.key == pygame.K_UP:
 						self.Player.jump()
+					if event.key == pygame.K_BACKSPACE:
+						grenade = self.Player.weapon.shoot()
+						if not grenade is None:
+							self.grenadeList.add(grenade)
 					if event.key == pygame.K_SPACE:
 						bullet = self.Player.weapon.shoot()
 						if not bullet is None:
