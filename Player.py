@@ -78,6 +78,7 @@ class player(Sprite):
 				self.hp -= 20
 				self.unhurtful = True
 
+
 		elevator_hit_list = spritecollide(self, self.elevator, False)
 		for each in elevator_hit_list:
 			if self.rect.bottom >= each.rect.top:

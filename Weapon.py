@@ -2,6 +2,7 @@
 from pygame.sprite import Sprite
 from pygame.image import load
 from Bullet import Bullet
+from Grenade import Grenade
 import os
 
 class Weapon(Sprite):
@@ -12,6 +13,12 @@ class Weapon(Sprite):
 		self.rect = self.image.get_rect()
 		self.direction = direction
 		self.shootingBullets = set()
+		self.shootingGrenades = set()
+
+	@staticmethod
+	def grenade_launcher(direction):
+		g_l = grenade_launcher(direction)
+		return g_l
 
 	@staticmethod
 	def baseballBat(direction):
@@ -24,7 +31,6 @@ class Weapon(Sprite):
 		return gun
 
 	def shoot(self):
-		#if
 		bullet = Bullet(self.direction)
 		bullet.rect.x, bullet.rect.y = self.rect.x, self.rect.y
 		if self.direction > 0:
@@ -34,6 +40,27 @@ class Weapon(Sprite):
 		self.shootingBullets.add(bullet)
 		return bullet
 
+	def launch(self):
+		grenade = Grenade(self.direction)
+		grenade.rect.x, grenade.rect.y = self.rect.x, self.rect.y
+		if self.direction > 0:
+			grenade.rect.left = self.rect.right
+		else:
+			grenade.rect.right = self.rect.left
+		self.shootingGrenades.add(grenade)
+		return grenade
+
+
+class grenade_launcher(Weapon):
+	def __init__(self, direction):
+		super().__init__(image = "grenade", direction = direction)
+
+	def shoot(self):
+		if len(self.shootingGrenades) < 3:
+			return super().launch()
+
+	def changeDirection(self, direction):
+		self.direction = direction
 
 
 class machineGun(Weapon):
@@ -42,7 +69,7 @@ class machineGun(Weapon):
 		super().__init__(image = name, direction = direction)
 
 	def shoot(self):
-		if len(self.shootingBullets) < 5: 
+		if len(self.shootingBullets) < 5:
 			return super().shoot()
 
 	def changeDirection(self, direction):

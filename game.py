@@ -21,6 +21,7 @@ class game:
 		self._generateElevators()
 		self._generateWeakLayer()
 		self.bulletList = pygame.sprite.Group()
+		self.grenadeList = pygame.sprite.Group()
 		try:
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socket.bind(('0.0.0.0', 7777))
@@ -68,6 +69,12 @@ class game:
 		self.platformList.draw(self.screen)
 		self.elevatorList.update()
 		self.elevatorList.draw(self.screen)
+		for each in self.grenadeList:
+			each.move()
+			if each.rect.right >= 1440 or each.rect.left <= 0:
+				self.grenadeList.remove(each)
+				self.Player.weapon.shootingGrenades.remove(each)
+
 		for each in self.elevators:
 			each.move()
 		for each in self.bulletList:
@@ -89,8 +96,11 @@ class game:
 						eachPlayer.shootingBullets.remove(each)
 					except:
 						pass
+
 		self.bulletList.update()
 		self.bulletList.draw(self.screen)
+		self.grenadeList.update()
+		self.grenadeList.draw(self.screen)
 		self.playerList.update()
 		self.playerList.draw(self.screen)
 		self.stickList.update()
@@ -141,6 +151,7 @@ class game:
 			# 			self.Player.stop()
 			# 		if event.key == pygame.K_RIGHT and self.Player.xSpeed > 0:
 			# 			self.Player.stop()
+>>>>>>> 60bf57cc83fb1c274eb5fc230b58537d0cdc1240
 			clock.tick(60)
 			self._update()
 		pygame.quit()
