@@ -8,7 +8,8 @@ from random import randint
 class player(Sprite):
 	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks):
 		super().__init__()
-		self.image = load(os.getcwd() + '/img/sprite-x/x-r1.png')
+		self.spriteName = 'a'
+		self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/' + self.spriteName + '-r1.png')
 		self.rect = self.image.get_rect()
 		self.xSpeed = 0
 		self.ySpeed = 0
@@ -115,7 +116,8 @@ class player(Sprite):
 	def _updateSprite(self):
 		if self.spriteCount == 3:
 			self.spriteCount = 0
-		pic = os.getcwd() + '/img/sprite-x/x-'
+		pic = os.getcwd() + '/img/sprite-'
+		pic += self.spriteName + '/' + self.spriteName + '-'
 		if self.direction == 1:
 			pic += 'r'
 		elif self.direction == -1:
