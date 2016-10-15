@@ -42,7 +42,7 @@ class game:
 		self.weakLayerGroup.add(self.weakLayer)
 
 	def addPlayer(self):
-		self.Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, sticks = self.stickList)
+		self.Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList)
 		initialLocation = (700, 500)
 		self.Player.rect.x, self.Player.rect.y = initialLocation
 		self.Player.weapon.rect.x, self.Player.weapon.rect.y = initialLocation
@@ -61,6 +61,10 @@ class game:
 			each.move()
 		for each in self.bulletList:
 			each.move()
+			if each.rect.right >= 1440 or each.rect.left <= 0:
+				print('Touch screen')
+				self.bulletList.remove(each)
+				self.Player.weapon.shootingBullets.remove(each)
 		self.bulletList.update()
 		self.bulletList.draw(self.screen)
 		self.playerList.update()

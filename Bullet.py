@@ -7,7 +7,7 @@ class Bullet(Sprite):
 		super().__init__()
 		self.image = load(os.getcwd() + '/img/bullet.png')
 		self.rect = self.image.get_rect()
-		self.speed = 6
+		self.speed = 9
 		self.direction = direction#1 for right, -1 for left
 
 	def move(self):

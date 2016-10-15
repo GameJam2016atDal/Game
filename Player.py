@@ -1,9 +1,10 @@
 from pygame.sprite import Sprite, spritecollide
 from pygame import Surface
+from pygame.time import get_ticks
 from Weapon import *
 
 class player(Sprite):
-	def __init__(self, platforms, elevator, weakLayer, sticks):
+	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks):
 		super().__init__()
 		self.image = Surface([50, 100])
 		self.image.fill((0, 255, 0))
@@ -14,12 +15,24 @@ class player(Sprite):
 		self.elevator = elevator
 		self.sticks = sticks
 		self.weakLayer = weakLayer
+		self.bulletList = bulletList
 		self.hp = 100
 		self.weapon = Weapon.machineGun(direction = 1)
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
+		self.unhurtful = False # When player is hit, there are 1 sec for him to be unhurtful
+		self.start_tick = None
 
 	def update(self):
+		if not self.start_tick is None:
+			currentTime = get_ticks()
+			if (currentTime - self.start_tick) / 1000 > 1:
+				self.unhurtful = False
+				self.image.fill((0, 255, 0))
 		self.calc_grav()
+		if self.rect.right > 1440:
+			self.rect.right = 1440
+		if self.rect.left < 0:
+			self.rect.left = 0
 		move = self._sliding()
 		if move > 4:
 			move = 4
@@ -50,11 +63,20 @@ class player(Sprite):
 			self.ySpeed = 0
 
 		sticks_hit_list = spritecollide(self, self.sticks, False)
+		if len(sticks_hit_list) > 0:
+			if self.unhurtful == False:
+				self.start_tick = get_ticks()
+				self.image.fill((0, 0, 0))
+				self.hp -= 10
+				self.unhurtful = True
 
-		for stick in sticks_hit_list:
-			#lose hp
-			#unhurtful for 2 seconds
-			pass
+		bullet_hit_list = spritecollide(self, self.bulletList, False)
+		for each in bullet_hit_list:
+			if self.unhurtful == False :
+				self.start_tick = get_ticks()
+				self.image.fill((0, 0, 0))
+				self.hp -= 20
+				self.unhurtful = True
 
 		elevator_hit_list = spritecollide(self, self.elevator, False)
 		for each in elevator_hit_list:

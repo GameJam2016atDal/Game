@@ -20,7 +20,10 @@ class Weapon(Sprite):
 	def shoot(self):
 		bullet = Bullet(self.direction)
 		bullet.rect.x, bullet.rect.y = self.rect.x, self.rect.y
-		bullet.rect.left = self.rect.right
+		if self.direction > 0:
+			bullet.rect.left = self.rect.right
+		else:
+			bullet.rect.right = self.rect.left
 		self.shootingBullets.add(bullet)
 		return bullet
 
