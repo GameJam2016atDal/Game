@@ -90,12 +90,12 @@ class player(Sprite):
 			elif self.xSpeed < 0:
 				self.rect.left = each.rect.right
 			self.xSpeed = 0
-	
+
 	def calc_grav(self):
 		if self.ySpeed == 0:
 			self.ySpeed = 1
 		else:
-			self.ySpeed += .35	
+			self.ySpeed += .35
 		if self.rect.y >= 850 - self.rect.height and self.ySpeed >= 0:
 			self.ySpeed = 0
 			self.rect.y = 850 - self.rect.height
@@ -108,15 +108,15 @@ class player(Sprite):
 		self.rect.y -= 1.3
 		if len(platform_hit_list) > 0 or len(weakLayer_list) > 0 or len(elevator_list) > 0:
 			self.ySpeed = -9
-	
+
 	def go_left(self):
 		self.direction = -1
 		self.weapon.changeDirection(self.direction)
-	
+
 	def go_right(self):
 		self.direction = 1
 		self.weapon.changeDirection(self.direction)
-	
+
 	def stop(self):
 		self.direction = 0
 
