@@ -1,5 +1,6 @@
 from pygame.sprite import Sprite, spritecollide
-from pygame import Surface
+from pygame.image import load
+import os
 from pygame.time import get_ticks
 from Weapon import *
 from random import randint
@@ -7,8 +8,7 @@ from random import randint
 class player(Sprite):
 	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks):
 		super().__init__()
-		self.image = Surface([50, 100])
-		self.image.fill((0, 255, 0))
+		self.image = load(os.getcwd() + '/img/sprite-x/x-r1.png')
 		self.rect = self.image.get_rect()
 		self.xSpeed = 0
 		self.ySpeed = 0
@@ -22,6 +22,7 @@ class player(Sprite):
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 		self.unhurtful = False # When player is hit, there are 1 sec for him to be unhurtful
 		self.start_tick = None
+		self.spriteCount = 0
 
 	def update(self):
 		if not self.start_tick is None:
@@ -40,6 +41,7 @@ class player(Sprite):
 					self.rect.x, self.rect.y = (-100, -100)
 					self.weapon.rect.x, self.weapon.rect.y = (-100, -100)
 					return
+		self._updateSprite()
 		self.calc_grav()
 		if self.rect.right > 1440:
 			self.rect.right = 1440
@@ -51,7 +53,11 @@ class player(Sprite):
 		elif move < -4:
 			move = -4
 		self.rect.x += move
-		self.weapon.rect.x, self.weapon.rect.y = self.rect.x, self.rect.y
+		self.weapon.rect.y = self.rect.y + 50
+		if self.direction == 1:
+			self.weapon.rect.x = self.rect.x + 20
+		elif self.direction == -1:
+			self.weapon.rect.x = self.rect.x - 30
 		self.weapon.rect.x += move
 		self.weapon.update()
 
@@ -105,6 +111,20 @@ class player(Sprite):
 			if self.rect.bottom >= each.rect.top:
 				self.ySpeed = each.speed
 
+	def _updateSprite(self):
+		if self.spriteCount == 3:
+			self.spriteCount = 0
+		pic = os.getcwd() + '/img/sprite-x/x-'
+		if self.direction == 1:
+			pic += 'r'
+		elif self.direction == -1:
+			pic += 'l'
+		else:
+			return
+		pic += str(self.spriteCount) + '.png'
+		self.spriteCount += 1
+		self.image = load(pic)
+
 	def _preventMoving(self, obstacle):
 		for each in obstacle:
 			if self.xSpeed > 0:
@@ -141,6 +161,7 @@ class player(Sprite):
 
 	def stop(self):
 		self.direction = 0
+		self.spriteCount = 0
 
 	def _sliding(self):
 		slidingRatio = 0.15
