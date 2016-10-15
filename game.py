@@ -16,6 +16,7 @@ class game:
 		self._generateSticks()
 		self._generateElevators()
 		self._generateWeakLayer()
+		self.bulletList = pygame.sprite.Group()
 
 	def _generatePlatform(self):
 		self.platformList = pygame.sprite.Group()
@@ -49,7 +50,6 @@ class game:
 			self.playerList = pygame.sprite.Group()
 		self.playerList.add(self.Player)
 		self.playerList.add(self.Player.weapon)
-		self.playerList.add(self.Player.weapon.shootingBullets)
 
 	def _update(self):
 		self.screen.fill(self._bgColour)
@@ -59,6 +59,10 @@ class game:
 		self.elevatorList.draw(self.screen)
 		for each in self.elevators:
 			each.move()
+		for each in self.bulletList:
+			each.move()
+		self.bulletList.update()
+		self.bulletList.draw(self.screen)
 		self.playerList.update()
 		self.playerList.draw(self.screen)
 		self.stickList.update()
@@ -86,7 +90,9 @@ class game:
 					if event.key == pygame.K_UP:
 						self.Player.jump()
 					if event.key == pygame.K_SPACE:
-						self.Player.weapon.shoot()
+						bullet = self.Player.weapon.shoot()
+						if not bullet is None:
+							self.bulletList.add(bullet)
 				if event.type == pygame.KEYUP:
 					if event.key == pygame.K_LEFT and self.Player.xSpeed < 0:
 						self.Player.stop()
