@@ -18,7 +18,7 @@ class player(Sprite):
 		self.weakLayer = weakLayer
 		self.bulletList = bulletList
 		self.hp = 100
-		self.weapon = Weapon.grenade_launcher(direction = 1)
+		self.weapon = Weapon.machineGun(1)
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 		self.unhurtful = False # When player is hit, there are 1 sec for him to be unhurtful
 		self.start_tick = None
@@ -30,7 +30,8 @@ class player(Sprite):
 			if self.hp > 0:
 				if (currentTime - self.start_tick) / 1000 > 1:
 					self.unhurtful = False
-					self.image.fill((0, 255, 0))
+					# Revert back
+					self._updateSprite()
 			else:
 				if (currentTime - self.start_tick) / 1000 > 5:
 					initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
@@ -84,7 +85,7 @@ class player(Sprite):
 		if len(sticks_hit_list) > 0:
 			if self.unhurtful == False:
 				self.start_tick = get_ticks()
-				self.image.fill((0, 0, 0))
+				self._updateSprite()
 				self.hp -= 10
 				if self.hp <= 0:
 					#Dead
@@ -97,7 +98,7 @@ class player(Sprite):
 		for each in bullet_hit_list:
 			if self.unhurtful == False :
 				self.start_tick = get_ticks()
-				self.image.fill((0, 0, 0))
+				self._updateSprite()
 				self.hp -= 20
 				if self.hp <= 0:
 					#Dead
@@ -121,7 +122,10 @@ class player(Sprite):
 			pic += 'l'
 		else:
 			return
-		pic += str(self.spriteCount) + '.png'
+		pic += str(self.spriteCount)
+		if self.unhurtful == True:
+			pic += 'h'
+		pic += '.png'
 		self.spriteCount += 1
 		self.image = load(pic)
 
