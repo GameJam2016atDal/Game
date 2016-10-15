@@ -6,6 +6,7 @@ from Platform import platform
 from Player import player
 from Elevator import Elevator
 from weakLayer import weakLayer
+from random import randint
 
 class game:
 	def __init__(self, screenSize, fullScreen = False, backgroundColour = (249, 250, 255)):
@@ -51,7 +52,8 @@ class game:
 
 	def addPlayer(self):
 		Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList)
-		initialLocation = (700, 500)
+		initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
+		initialLocation = initialLocations[randint(0, 3)]
 		Player.rect.x, Player.rect.y = initialLocation
 		Player.weapon.rect.x, Player.weapon.rect.y = initialLocation
 		if self.playerList is None:
@@ -81,7 +83,6 @@ class game:
 						pass
 
 			if each.rect.right >= 1440 or each.rect.left <= 0:
-				print('Touch screen')
 				self.bulletList.remove(each)
 				for eachPlayer in self.playerList:
 					try:
@@ -114,10 +115,9 @@ class game:
 				thread = ClientThread(client, player, self.bulletList)
 				thread.start()
 			print(playerCount)
-			if playerCount == 2:
+			if playerCount == 1:
 				self.begin = True
 		while self.gaming:
-
 			# for event in pygame.event.get():
 			# 	if event.type == pygame.QUIT:
 			# 		self.gaming = False
