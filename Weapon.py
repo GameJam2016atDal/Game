@@ -42,9 +42,13 @@ class machineGun(Weapon):
 		super().__init__(image = name, direction = direction)
 
 	def shoot(self):
-		if len(self.shootingBullets) < 5:
-<<<<<<< HEAD
-			super().shoot()
+		if len(self.shootingBullets) < 5: 
+			return super().shoot()
+
+	def changeDirection(self, direction):
+		name = 'normalGun-l' if direction == -1 else 'normalGun-r'
+		self.image = load(os.getcwd() + '/img/' + name + '.png')
+		self.direction = direction
 
 class baseballBat(Weapon):
 	def __init__(self, direction):
@@ -53,11 +57,4 @@ class baseballBat(Weapon):
 	def shoot(self):
 		# animation
 		# if collision with player lose HP
-=======
-			return super().shoot()
-
-	def changeDirection(self, direction):
-		name = 'normalGun-l' if direction == -1 else 'normalGun-r'
-		self.image = load(os.getcwd() + '/img/' + name + '.png')
-		self.direction = direction
->>>>>>> 81dc9e22972dc1cfd21404817028349baa851ffb
+		return super().shoot()
