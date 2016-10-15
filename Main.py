@@ -1,3 +1,4 @@
+#!/usr/local/bin/python3
 from game import game
 
 if __name__ == '__main__':

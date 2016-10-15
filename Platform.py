@@ -11,7 +11,7 @@ class platform(Sprite):
 	@staticmethod
 	def generatePlatforms():
 		imgs = ['platform1', 'layer2_l', 'layer2', 'pillar_l', 'pillar_r', 'shortStage', 'shortStage', 'shortStage', 'shortStage', 'topStage', 'topStage']
-		coordinates = [(0, 800), (270, 690), (780, 690), (270, 700), (1100, 700), (300, 500), (840, 500), (300, 350), (840, 350), (170, 200), (780, 200)]
+		coordinates = [(0, 800), (270, 690), (780, 690), (270, 700), (1100, 700), (280, 500), (890, 500), (280, 350), (890, 350), (170, 200), (780, 200)]
 		platFormList = list()
 		for (eachImg, eachCoordinate) in zip(imgs, coordinates):
 			plat = platform(img = eachImg)

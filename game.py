@@ -1,6 +1,8 @@
 import pygame
 from Platform import platform
 from Player import player
+from Elevator import Elevator
+from weakLayer import weakLayer
 
 class game:
 	def __init__(self, screenSize, fullScreen = False, backgroundColour = (249, 250, 255)):
@@ -12,6 +14,8 @@ class game:
 		self.playerList = None
 		self._generatePlatform()
 		self._generateSticks()
+		self._generateElevators()
+		self._generateWeakLayer()
 
 	def _generatePlatform(self):
 		self.platformList = pygame.sprite.Group()
@@ -25,8 +29,19 @@ class game:
 		for stick in sticks:
 			self.stickList.add(stick)
 
+	def _generateElevators(self):
+		self.elevatorList = pygame.sprite.Group()
+		self.elevators = Elevator.generateElevators()
+		for each in self.elevators:
+			self.elevatorList.add(each)
+
+	def _generateWeakLayer(self):
+		self.weakLayer = weakLayer()
+		self.weakLayerGroup = pygame.sprite.Group()
+		self.weakLayerGroup.add(self.weakLayer)
+
 	def addPlayer(self):
-		self.Player = player(platforms = self.platformList, sticks = self.stickList)
+		self.Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, sticks = self.stickList)
 		initialLocation = (700, 500)
 		self.Player.rect.x, self.Player.rect.y = initialLocation
 		if self.playerList is None:
@@ -37,10 +52,16 @@ class game:
 		self.screen.fill(self._bgColour)
 		self.platformList.update()
 		self.platformList.draw(self.screen)
+		self.elevatorList.update()
+		self.elevatorList.draw(self.screen)
+		for each in self.elevators:
+			each.move()
 		self.playerList.update()
 		self.playerList.draw(self.screen)
 		self.stickList.update()
 		self.stickList.draw(self.screen)
+		self.weakLayerGroup.update()
+		self.weakLayerGroup.draw(self.screen)
 		pygame.display.flip()
 
 	def start(self):

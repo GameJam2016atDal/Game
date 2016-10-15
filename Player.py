@@ -2,7 +2,7 @@ from pygame.sprite import Sprite, spritecollide
 from pygame import Surface
 
 class player(Sprite):
-	def __init__(self, platforms, sticks):
+	def __init__(self, platforms, elevator, weakLayer, sticks):
 		super().__init__()
 		self.image = Surface([50, 100])
 		self.image.fill((0, 255, 0))
@@ -10,7 +10,10 @@ class player(Sprite):
 		self.xSpeed = 0
 		self.ySpeed = 0
 		self.platforms = platforms
+		self.elevator = elevator
 		self.sticks = sticks
+		self.weakLayer = weakLayer
+		self.hp = 100
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 
 	def update(self):
@@ -23,12 +26,14 @@ class player(Sprite):
 		self.rect.x += move
 
 		block_hit_list = spritecollide(self, self.platforms, False)
-		for block in block_hit_list:
-			if self.xSpeed > 0:
-				self.rect.right = block.rect.left
-			elif self.xSpeed < 0:
-				self.rect.left = block.rect.right
-			self.xSpeed = 0
+		self._preventMoving(block_hit_list)
+		weakLayer_list = spritecollide(self, self.weakLayer, False)
+		for each in weakLayer_list:
+			if self.ySpeed > 0:
+				self.rect.bottom = each.rect.top
+			elif self.ySpeed < 0:
+				self.rect.top = each.rect.bottom
+			self.ySpeed = 0
 
 		self.rect.y += self.ySpeed
 		block_hit_list = spritecollide(self, self.platforms, False)
@@ -38,6 +43,26 @@ class player(Sprite):
 			elif self.ySpeed < 0:
 				self.rect.top = block.rect.bottom
 			self.ySpeed = 0
+
+		sticks_hit_list = spritecollide(self, self.sticks, False)
+
+		for stick in sticks_hit_list:
+			#lose hp
+			#unhurtful for 2 seconds
+			pass
+
+		elevator_hit_list = spritecollide(self, self.elevator, False)
+		for each in elevator_hit_list:
+			if self.rect.bottom >= each.rect.top:
+				self.ySpeed = each.speed
+
+	def _preventMoving(self, obstacle):
+		for each in obstacle:
+			if self.xSpeed > 0:
+				self.rect.right = each.rect.left
+			elif self.xSpeed < 0:
+				self.rect.left = each.rect.right
+			self.xSpeed = 0
 	
 	def calc_grav(self):
 		if self.ySpeed == 0:
@@ -51,8 +76,10 @@ class player(Sprite):
 	def jump(self):
 		self.rect.y += 1.3
 		platform_hit_list = spritecollide(self, self.platforms, False)
+		weakLayer_list = spritecollide(self, self.weakLayer, False)
+		elevator_list = spritecollide(self, self.elevator, False)
 		self.rect.y -= 1.3
-		if len(platform_hit_list) > 0 or self.rect.bottom >= 850:
+		if len(platform_hit_list) > 0 or len(weakLayer_list) > 0 or len(elevator_list) > 0:
 			self.ySpeed = -9
 	
 	def go_left(self):
