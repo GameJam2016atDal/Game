@@ -11,7 +11,6 @@ from random import randint
 from Grenade import Grenade
 from pygame.time import get_ticks
 from giantSpike import giantSpike
-from shotgunShell import shotgunShell
 from Weapon import *
 
 class game:
@@ -73,7 +72,6 @@ class game:
 		self.weakLayerGroup.add(self.weakLayer)
 
 	def addPlayer(self):
-		"""
 		charRand = randint(0, 5)
 		while charRand in self.usedCharacters:
 			charRand = randint(0, 5)
@@ -88,18 +86,16 @@ class game:
 		self.playerList.add(Player)
 		self.playerList.add(Player.weapon)
 		return Player
-		"""
 
-		self.Player = player(character = "z", platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList, giantSpike = self.giantSpikeList)
-		initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
-		initialLocation = initialLocations[randint(0, 3)]
-		self.Player.rect.x, self.Player.rect.y = initialLocation
-		self.Player.weapon.rect.x, self.Player.weapon.rect.y = initialLocation
-		if self.playerList is None:
-			self.playerList = pygame.sprite.Group()
-		self.playerList.add(self.Player)
-		self.playerList.add(self.Player.weapon)
-		self.Player.playerList = self.playerList
+		# self.Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList, giantSpike = self.giantSpikeList)
+		# initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
+		# initialLocation = initialLocations[randint(0, 3)]
+		# self.Player.rect.x, self.Player.rect.y = initialLocation
+		# self.Player.weapon.rect.x, self.Player.weapon.rect.y = initialLocation
+		# if self.playerList is None:
+		# 	self.playerList = pygame.sprite.Group()
+		# self.playerList.add(self.Player)
+		# self.playerList.add(self.Player.weapon)
 
 	def _update(self):
 		self.screen.fill(self._bgColour)
@@ -203,12 +199,9 @@ class game:
 		pygame.display.flip()
 
 	def start(self):
-
+		self.socket.listen(10)
 		clock = pygame.time.Clock()
 		self.gaming = True
-		"""
-		self.socket.listen(10)
-
 
 		pygame.mixer.music.load(os.getcwd()+'/music/Androids.wav')
 		pygame.mixer.music.play(-1)
@@ -227,58 +220,43 @@ class game:
 			print(playerCount)
 			if playerCount == 2:
 				self.begin = True
-				"""
 		while self.gaming:
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					self.gaming = False
-					break
-				if event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_BACKSPACE:
+		# 	for event in pygame.event.get():
+		# 		if event.type == pygame.QUIT:
+		# 			self.gaming = False
+		# 			break
+		# 		if event.type == pygame.KEYDOWN:
+		# 			if event.key == pygame.K_ESCAPE:
+		# 				self.gaming = False
+		# 				break
+		# 			if event.key == pygame.K_LEFT:
+		# 				self.Player.go_left()
+		# 			if event.key == pygame.K_RIGHT:
+		# 				self.Player.go_right()
+		# 			if event.key == pygame.K_UP:
+		# 				self.Player.jump()
+		# 			if event.key == pygame.K_SPACE:
+		# 				bullet = self.Player.weapon.shoot()
+		# 				if not bullet is None:
+		# 					self.bulletList.add(bullet)
+		# 			if event.key == pygame.K_1:
+		# 				self.playerList.remove(self.Player.weapon)
+		# 				self.Player.weapon = Weapon.machineGun(1)
+		# 				self.Player.weapon.rect.x = self.Player.rect.x + 50
+		# 				self.Player.weapon.update()
+		# 				self.playerList.add(self.Player.weapon)
+		# 			if event.key == pygame.K_2:
+		# 				self.playerList.remove(self.Player.weapon)
+		# 				self.Player.weapon = Weapon.grenade_launcher(direction = 1)
+		# 				self.Player.weapon.rect.x = self.Player.rect.x + 50
+		# 				self.Player.weapon.update()
+		# 				self.playerList.add(self.Player.weapon)
 
-						for eachPlayer in self.playerList:
-							try:
-								print(len(eachPlayer.shootingBullets))
-								print(eachPlayer.shootingBullets)
-							except:
-								pass
-
-					if event.key == pygame.K_ESCAPE:
-						self.gaming = False
-						break
-					if event.key == pygame.K_LEFT:
-						self.Player.go_left()
-					if event.key == pygame.K_RIGHT:
-						self.Player.go_right()
-					if event.key == pygame.K_1:
-						self.playerList.remove(self.Player.weapon)
-						self.Player.weapon = Weapon.machineGun(1)
-						self.Player.weapon.rect.x = self.Player.rect.x + 50
-						self.Player.weapon.update()
-						self.playerList.add(self.Player.weapon)
-					if event.key == pygame.K_2:
-						self.playerList.remove(self.Player.weapon)
-						self.Player.weapon = Weapon.grenade_launcher(direction = 1)
-						self.Player.weapon.rect.x = self.Player.rect.x + 50
-						self.Player.weapon.update()
-						self.playerList.add(self.Player.weapon)
-					if event.key == pygame.K_3:
-						self.playerList.remove(self.Player.weapon)
-						self.Player.weapon = Weapon.shotgun(direction = 1)
-						self.Player.weapon.rect.x = self.Player.rect.x + 50
-						self.Player.weapon.update()
-						self.playerList.add(self.Player.weapon)
-					if event.key == pygame.K_UP:
-						self.Player.jump()
-					if event.key == pygame.K_SPACE:
-						bullet = self.Player.weapon.shoot()
-						if not bullet is None:
-							self.bulletList.add(bullet)
-				if event.type == pygame.KEYUP:
-					if event.key == pygame.K_LEFT and self.Player.xSpeed < 0:
-						self.Player.stop()
-					if event.key == pygame.K_RIGHT and self.Player.xSpeed > 0:
-						self.Player.stop()
+		# 		if event.type == pygame.KEYUP:
+		# 			if event.key == pygame.K_LEFT and self.Player.xSpeed < 0:
+		# 				self.Player.stop()
+		# 			if event.key == pygame.K_RIGHT and self.Player.xSpeed > 0:
+		# 				self.Player.stop()
 			clock.tick(60)
 			self._update()
 		pygame.quit()

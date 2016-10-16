@@ -17,7 +17,6 @@ class Weapon(Sprite):
 		self.shootingBullets = set()
 		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/'+image+'.wav')
 
-
 	@staticmethod
 	def grenade_launcher(direction):
 		g_l = grenade_launcher(direction)
@@ -101,7 +100,6 @@ class grenade_launcher(Weapon):
 
 	def update(self):
 		self.image = load(os.getcwd() + '/img/grenade.png')
-		self.shootingBullets = set()
 		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/grenade.wav')
 
 class machineGun(Weapon):
