@@ -7,10 +7,10 @@ from Weapon import *
 from random import randint
 
 class player(Sprite):
-	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks, giantSpike):
+	def __init__(self, character, platforms, elevator, weakLayer, bulletList, sticks, giantSpike):
 		super().__init__()
 		pygame.mixer.pre_init()
-		self.spriteName = 'b'
+		self.spriteName = character
 		self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/' + self.spriteName + '-r1.png')
 		self.rect = self.image.get_rect()
 		self.xSpeed = 0
@@ -29,6 +29,7 @@ class player(Sprite):
 		self.hit_sound = pygame.mixer.Sound(os.getcwd() + '/music/hit.wav')
 		self.death_sound = pygame.mixer.Sound(os.getcwd() + '/music/death.wav')
 		self.giantSpike = giantSpike
+		self.playerList = None
 
 	def update(self):
 
@@ -196,7 +197,7 @@ class player(Sprite):
 	def stop(self):
 		self.direction = 0
 		self.spriteCount = 0
-
+		
 	def _sliding(self):
 		slidingRatio = 0.15
 		maxSpeed = 4
