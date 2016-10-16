@@ -18,7 +18,7 @@ class player(Sprite):
 		self.weakLayer = weakLayer
 		self.bulletList = bulletList
 		self.hp = 100
-		self.weapon = Weapon.grenade_launcher(direction = 1)
+		self.weapon = Weapon.machineGun(direction = 1)
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 		self.unhurtful = False # When player is hit, there are 1 sec for him to be unhurtful
 		self.start_tick = None

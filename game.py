@@ -7,6 +7,7 @@ from Player import player
 from Elevator import Elevator
 from weakLayer import weakLayer
 from random import randint
+from Grenade import Grenade
 
 class game:
 	def __init__(self, screenSize, fullScreen = False, backgroundColour = (249, 250, 255)):
@@ -83,7 +84,6 @@ class game:
 			each.move()
 		for each in self.bulletList:
 			each.move()
-
 			weak_hit_list = pygame.sprite.spritecollide(each, self.weakLayerGroup, True)
 			if len(weak_hit_list) > 0:
 				self.bulletList.remove(each)
@@ -97,12 +97,21 @@ class game:
 			elevator_hit_list = pygame.sprite.spritecollide(each, self.elevatorList, False)
 
 			if len(block_hit_list) > 0 or len(elevator_hit_list) > 0:
-				self.bulletList.remove(each)
-				for eachPlayer in self.playerList:
-					try:
-						eachPlayer.shootingBullets.remove(each)
-					except:
-						pass
+				if isinstance(each, Grenade) and not each.bounced:
+					each.bounced = True
+					each.move()
+					each.move()
+					each.move()
+				else:
+					self.bulletList.remove(each)
+					for eachPlayer in self.playerList:
+						try:
+							eachPlayer.shootingBullets.remove(each)
+						except:
+							pass
+
+
+
 
 			if each.rect.right >= 1440 or each.rect.left <= 0:
 				self.bulletList.remove(each)
