@@ -7,10 +7,10 @@ from Weapon import *
 from random import randint
 
 class player(Sprite):
-	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks, giantSpike):
+	def __init__(self, character, platforms, elevator, weakLayer, bulletList, sticks, giantSpike):
 		super().__init__()
 		pygame.mixer.pre_init()
-		self.spriteName = 'b'
+		self.spriteName = character
 		self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/' + self.spriteName + '-r1.png')
 		self.rect = self.image.get_rect()
 		self.xSpeed = 0
@@ -29,8 +29,10 @@ class player(Sprite):
 		self.hit_sound = pygame.mixer.Sound(os.getcwd() + '/music/hit.wav')
 		self.death_sound = pygame.mixer.Sound(os.getcwd() + '/music/death.wav')
 		self.giantSpike = giantSpike
+		self.playerList = None
 
 	def update(self):
+
 		if not self.start_tick is None:
 			currentTime = get_ticks()
 			if self.hp > 0:
@@ -62,6 +64,7 @@ class player(Sprite):
 		elif move < -4:
 			move = -4
 		self.rect.x += move
+		self.weapon.update()
 		self.weapon.rect.y = self.rect.y + 50
 		if self.direction == 1:
 			self.weapon.rect.x = self.rect.x + 20
@@ -77,6 +80,9 @@ class player(Sprite):
 			elif self.ySpeed < 0:
 				self.rect.top = each.rect.bottom
 			self.ySpeed = 0
+
+		block_hit_list = spritecollide(self, self.platforms, False)
+		self._preventMoving(block_hit_list)
 
 		self.rect.y += self.ySpeed
 		block_hit_list = spritecollide(self, self.platforms, False)
@@ -115,20 +121,23 @@ class player(Sprite):
 
 		elevator_hit_list = spritecollide(self, self.elevator, False)
 		for each in elevator_hit_list:
-			if self.rect.bottom >= each.rect.top:
-				print('Speed' + str(self.ySpeed))
+			if self.rect.bottom < each.rect.top:
 				self.ySpeed = each.speed
+			else:
+				self.rect.bottom = each.rect.top
 
 		giantSpike_hit_list = spritecollide(self, self.giantSpike, False)
-		if len(giantSpike_hit_list) > 0 and self.unhurtful == False:
-			self.start_tick = get_ticks()
-			self._updateSprite()
-			self.hp -= 90
-			if self.hp <= 0:
-				#Dead
-				pass
-			else:
-				self.unhurtful = True
+		for each in giantSpike_hit_list:
+			if each.rect.bottom >= self.rect.top and self.unhurtful == False:
+				self.start_tick = get_ticks()
+				self._updateSprite()
+				self.hp -= 90
+				self.hit_sound.play()
+				if self.hp <= 0:
+					#Dead
+					self.death_sound.play()
+				else:
+					self.unhurtful = True
 
 
 	def _updateSprite(self):
@@ -172,8 +181,10 @@ class player(Sprite):
 		weakLayer_list = spritecollide(self, self.weakLayer, False)
 		elevator_list = spritecollide(self, self.elevator, False)
 		self.rect.y -= 1.3
+
 		if len(platform_hit_list) > 0 or len(weakLayer_list) > 0 or len(elevator_list) > 0:
 			self.ySpeed = -9
+
 
 	def go_left(self):
 		self.direction = -1
@@ -186,7 +197,7 @@ class player(Sprite):
 	def stop(self):
 		self.direction = 0
 		self.spriteCount = 0
-
+		
 	def _sliding(self):
 		slidingRatio = 0.15
 		maxSpeed = 4

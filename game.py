@@ -12,6 +12,7 @@ from Grenade import Grenade
 from pygame.time import get_ticks
 from giantSpike import giantSpike
 from shotgunShell import shotgunShell
+from Weapon import *
 
 class game:
 	def __init__(self, screenSize, fullScreen = False, backgroundColour = (249, 250, 255)):
@@ -27,6 +28,9 @@ class game:
 		self._generateWeakLayer()
 		self._generateGiantSpike()
 		self.bulletList = pygame.sprite.Group()
+		self.weakLayerBrokenTime = None
+		self.characterList = ['a', 'b', 'c', 'x', 'y', 'z']
+		self.usedCharacters = set()
 		try:
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socket.bind(('0.0.0.0', 7777))
@@ -42,6 +46,8 @@ class game:
 		self.giantSpikePlat.rect.x, self.giantSpikePlat.rect.y = self.giantSpike.rect.x + 10, self.giantSpike.rect.y - 5
 		self.giantSpike.plat = self.giantSpikePlat
 		self.elevatorList.add(self.giantSpikePlat)
+		self.chainGroup = pygame.sprite.Group()
+		self.chainGroup.add(self.giantSpike.chain)
 
 	def _generatePlatform(self):
 		self.platformList = pygame.sprite.Group()
@@ -67,18 +73,24 @@ class game:
 		self.weakLayerGroup.add(self.weakLayer)
 
 	def addPlayer(self):
-		# Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList)
-		# initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
-		# initialLocation = initialLocations[randint(0, 3)]
-		# Player.rect.x, Player.rect.y = initialLocation
-		# Player.weapon.rect.x, Player.weapon.rect.y = initialLocation
-		# if self.playerList is None:
-		# 	self.playerList = pygame.sprite.Group()
-		# self.playerList.add(Player)
-		# self.playerList.add(Player.weapon)
-		# return Player
+		"""
+		charRand = randint(0, 5)
+		while charRand in self.usedCharacters:
+			charRand = randint(0, 5)
+		name = self.characterList[charRand]
+		Player = player(character = name, platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList, giantSpike = self.giantSpikeList)
+		initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
+		initialLocation = initialLocations[randint(0, 3)]
+		Player.rect.x, Player.rect.y = initialLocation
+		Player.weapon.rect.x, Player.weapon.rect.y = initialLocation
+		if self.playerList is None:
+			self.playerList = pygame.sprite.Group()
+		self.playerList.add(Player)
+		self.playerList.add(Player.weapon)
+		return Player
+		"""
 
-		self.Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList, giantSpike = self.giantSpikeList)
+		self.Player = player(character = "z", platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList, giantSpike = self.giantSpikeList)
 		initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
 		initialLocation = initialLocations[randint(0, 3)]
 		self.Player.rect.x, self.Player.rect.y = initialLocation
@@ -87,6 +99,7 @@ class game:
 			self.playerList = pygame.sprite.Group()
 		self.playerList.add(self.Player)
 		self.playerList.add(self.Player.weapon)
+		self.Player.playerList = self.playerList
 
 	def _update(self):
 		self.screen.fill(self._bgColour)
@@ -94,6 +107,11 @@ class game:
 		self.platformList.draw(self.screen)
 		self.elevatorList.update()
 		self.elevatorList.draw(self.screen)
+
+		currentTime = get_ticks()
+		if not self.weakLayerBrokenTime is None and (currentTime - self.weakLayerBrokenTime) / 1000 > 10:
+			self.weakLayer = weakLayer()
+			self.weakLayerGroup.add(self.weakLayer)
 
 		for each in self.elevators:
 			if each.rect.x != 630:
@@ -125,6 +143,7 @@ class game:
 
 			weak_hit_list = pygame.sprite.spritecollide(each, self.weakLayerGroup, True)
 			if len(weak_hit_list) > 0:
+				self.weakLayerBrokenTime = get_ticks()
 				self.bulletList.remove(each)
 				for eachPlayer in self.playerList:
 					try:
@@ -157,6 +176,10 @@ class game:
 						pass
 
 		weak_hit_list = pygame.sprite.spritecollide(self.giantSpike, self.weakLayerGroup, True)
+		if len(weak_hit_list) > 0:
+			self.weakLayerBrokenTime = get_ticks()
+		# if self.giantSpike.moveUp == False and self.giantSpike.movable == False and len(self.weakLayerGroup) == 0:
+		# 	self._generateWeakLayer()
 
 		self.bulletList.update()
 		self.bulletList.draw(self.screen)
@@ -168,30 +191,36 @@ class game:
 		self.weakLayerGroup.draw(self.screen)
 		self.giantSpikeList.update()
 		self.giantSpikeList.draw(self.screen)
+		self.chainGroup.update()
+		self.chainGroup.draw(self.screen)
 		pygame.display.flip()
 
 	def start(self):
-		self.socket.listen(10)
+
 		clock = pygame.time.Clock()
 		self.gaming = True
+		"""
+		self.socket.listen(10)
+
 
 		pygame.mixer.music.load(os.getcwd()+'/music/Androids.wav')
 		pygame.mixer.music.play(-1)
 		pygame.mixer.music.set_volume(0.25)
-		# self.begin = False
-		# addressSet = set()
-		# playerCount = 0
-		# while self.begin != True:
-		# 	client, addr = self.socket.accept()
-		# 	if not client is None and not (addr in addressSet):
-		# 		addressSet.add(addr)
-		# 		player = self.addPlayer()
-		# 		playerCount += 1
-		# 		thread = ClientThread(client, player, self.bulletList)
-		# 		thread.start()
-		# 	print(playerCount)
-		# 	if playerCount == 1:
-		# 		self.begin = True
+		self.begin = False
+		addressSet = set()
+		playerCount = 0
+		while self.begin != True:
+			client, addr = self.socket.accept()
+			if not client is None and not (addr in addressSet):
+				addressSet.add(addr)
+				player = self.addPlayer()
+				playerCount += 1
+				thread = ClientThread(client, player, self.bulletList, self.playerList)
+				thread.start()
+			print(playerCount)
+			if playerCount == 2:
+				self.begin = True
+				"""
 		while self.gaming:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
@@ -206,7 +235,7 @@ class game:
 								print(eachPlayer.shootingBullets)
 							except:
 								pass
-						
+
 					if event.key == pygame.K_ESCAPE:
 						self.gaming = False
 						break

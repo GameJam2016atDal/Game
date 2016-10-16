@@ -97,6 +97,10 @@ class grenade_launcher(Weapon):
 	def changeDirection(self, direction):
 		self.direction = direction
 
+	def update(self):
+		self.image = load(os.getcwd() + '/img/grenade.png')
+		self.shootingBullets = set()
+		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/grenade.wav')
 
 class machineGun(Weapon):
 	def __init__(self, direction):
@@ -112,6 +116,11 @@ class machineGun(Weapon):
 		self.image = load(os.getcwd() + '/img/' + name + '.png')
 		self.direction = direction
 
+	def update(self):
+		name = 'normalGun-l' if self.direction == -1 else 'normalGun-r'
+		self.image = load(os.getcwd() + '/img/' + name + '.png')
+		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/' + name + '.wav')
+
 class shotgun(Weapon):
 	def __init__(self, direction):
 		name = 'shotgun-l' if direction == -1 else 'shotgun-r'
@@ -125,6 +134,11 @@ class shotgun(Weapon):
 		name = 'shotgun-l' if direction == -1 else 'shotgun-r'
 		self.image = load(os.getcwd() + '/img/' + name + '.png')
 		self.direction = direction
+
+	def update(self):
+		name = 'shotgun-l' if self.direction == -1 else 'shotgun-r'
+		self.image = load(os.getcwd() + '/img/' + name + '.png')
+		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/' + name + '.wav')
 
 class baseballBat(Weapon):
 	def __init__(self, direction):
