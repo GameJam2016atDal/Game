@@ -106,8 +106,12 @@ class game:
 
 		currentTime = get_ticks()
 		if not self.weakLayerBrokenTime is None and (currentTime - self.weakLayerBrokenTime) / 1000 > 10:
-			self.weakLayer = weakLayer()
-			self.weakLayerGroup.add(self.weakLayer)
+			self._generateWeakLayer()
+			for each in playerList:
+				try:
+					each.weakLayer = self.weakLayer
+				except:
+					pass
 
 		for each in self.elevators:
 			if each.rect.x != 630:
