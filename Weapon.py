@@ -1,4 +1,4 @@
-
+import pygame
 from pygame.sprite import Sprite
 from pygame.image import load
 from Bullet import Bullet
@@ -8,11 +8,14 @@ import os
 class Weapon(Sprite):
 	def __init__(self, image, direction):
 		super().__init__()
+		pygame.mixer.pre_init()
 		self.name = image
 		self.image = load(os.getcwd() + '/img/' + image + '.png')
 		self.rect = self.image.get_rect()
 		self.direction = direction
 		self.shootingBullets = set()
+		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/'+image+'.wav')
+
 
 	@staticmethod
 	def grenade_launcher(direction):
@@ -30,6 +33,7 @@ class Weapon(Sprite):
 		return gun
 
 	def shoot(self):
+		self.sound.play()
 		bullet = Bullet(self.direction)
 		bullet.rect.x, bullet.rect.y = self.rect.x, self.rect.y
 		if self.direction > 0:
@@ -40,10 +44,11 @@ class Weapon(Sprite):
 		return bullet
 
 	def launch(self):
+		self.sound.play()
 		grenade = Grenade(self.direction)
 		grenade.rect.x, grenade.rect.y = self.rect.x, self.rect.y
 		if self.direction > 0:
-			grenade.rect.left = self.rect.right+20
+			grenade.rect.left = self.rect.right+25
 		else:
 			grenade.rect.right = self.rect.left
 		self.shootingBullets.add(grenade)

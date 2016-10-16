@@ -1,6 +1,7 @@
 from pygame.sprite import Sprite, spritecollide
 from pygame.image import load
 import os
+import pygame
 from pygame.time import get_ticks
 from Weapon import *
 from random import randint
@@ -8,6 +9,7 @@ from random import randint
 class player(Sprite):
 	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks):
 		super().__init__()
+		pygame.mixer.pre_init()
 		self.spriteName = 'b'
 		self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/' + self.spriteName + '-r1.png')
 		self.rect = self.image.get_rect()
@@ -19,11 +21,13 @@ class player(Sprite):
 		self.weakLayer = weakLayer
 		self.bulletList = bulletList
 		self.hp = 100
-		self.weapon = Weapon.machineGun(direction = 1)
+		self.weapon = Weapon.grenade_launcher(direction = 1)
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 		self.unhurtful = False # When player is hit, there are 1 sec for him to be unhurtful
 		self.start_tick = None
 		self.spriteCount = 0
+		self.hit_sound = pygame.mixer.Sound(os.getcwd() + '/music/hit.wav')
+		self.death_sound = pygame.mixer.Sound(os.getcwd() + '/music/death.wav')
 
 	def update(self):
 		if not self.start_tick is None:
@@ -88,9 +92,10 @@ class player(Sprite):
 				self.start_tick = get_ticks()
 				self._updateSprite()
 				self.hp -= 10
+				self.hit_sound.play()
 				if self.hp <= 0:
-					#Dead
-					pass
+					#death
+					self.death_sound.play()
 				else:
 					self.unhurtful = True
 
@@ -100,9 +105,10 @@ class player(Sprite):
 				self.start_tick = get_ticks()
 				self._updateSprite()
 				self.hp -= 20
+				self.hit_sound.play()
 				if self.hp <= 0:
-					#Dead
-					pass
+					#death
+					self.death_sound.play()
 				else:
 					self.unhurtful = True
 

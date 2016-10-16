@@ -1,6 +1,7 @@
 import pygame
 import socket
 import sys
+import os
 from ClientThread import ClientThread
 from Platform import platform
 from Player import player
@@ -131,6 +132,10 @@ class game:
 		self.socket.listen(10)
 		clock = pygame.time.Clock()
 		self.gaming = True
+
+		pygame.mixer.music.load(os.getcwd()+'/music/Androids.wav')
+		pygame.mixer.music.play(-1)
+		pygame.mixer.music.set_volume(0.25)
 		# self.begin = False
 		# addressSet = set()
 		# playerCount = 0
