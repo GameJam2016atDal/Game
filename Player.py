@@ -120,9 +120,10 @@ class player(Sprite):
 
 		elevator_hit_list = spritecollide(self, self.elevator, False)
 		for each in elevator_hit_list:
-			if self.rect.bottom >= each.rect.top:
-				print('Speed' + str(self.ySpeed))
+			if self.rect.bottom < each.rect.top:
 				self.ySpeed = each.speed
+			else:
+				self.rect.bottom = each.rect.top
 
 		giantSpike_hit_list = spritecollide(self, self.giantSpike, False)
 		for each in giantSpike_hit_list:
@@ -130,9 +131,10 @@ class player(Sprite):
 				self.start_tick = get_ticks()
 				self._updateSprite()
 				self.hp -= 90
+				self.hit_sound.play()
 				if self.hp <= 0:
 					#Dead
-					pass
+					self.death_sound.play()
 				else:
 					self.unhurtful = True
 
@@ -178,8 +180,10 @@ class player(Sprite):
 		weakLayer_list = spritecollide(self, self.weakLayer, False)
 		elevator_list = spritecollide(self, self.elevator, False)
 		self.rect.y -= 1.3
+
 		if len(platform_hit_list) > 0 or len(weakLayer_list) > 0 or len(elevator_list) > 0:
 			self.ySpeed = -9
+
 
 	def go_left(self):
 		self.direction = -1

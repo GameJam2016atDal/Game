@@ -25,17 +25,17 @@ class giantSpike(Sprite):
 		if self.movable == False:
 			return
 		if self.rect.y <= 700 and self.moveUp == False:
-			self.rect.y += self.speed
 			self.plat.rect.y += self.speed
 			self.plat.speed = self.speed
+			self.rect.y += self.speed
 		else:
 			self.currentTime = get_ticks()
-			if (self.currentTime - self.startTime) / 1000 > 4:
+			if (self.currentTime - self.startTime) / 1000 > 5:
 				if self.rect.y >= -70:
 					self.moveUp = True
 					self.plat.rect.y -= self.moveUpSpeed
-					self.rect.y -= self.moveUpSpeed
 					self.plat.speed = -self.moveUpSpeed
+					self.rect.y -= self.moveUpSpeed
 				else:
 					self.moveUp = False
 					self.movable = False
