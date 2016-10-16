@@ -7,7 +7,7 @@ from Weapon import *
 from random import randint
 
 class player(Sprite):
-	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks):
+	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks, giantSpike):
 		super().__init__()
 		pygame.mixer.pre_init()
 		self.spriteName = 'b'
@@ -28,6 +28,7 @@ class player(Sprite):
 		self.spriteCount = 0
 		self.hit_sound = pygame.mixer.Sound(os.getcwd() + '/music/hit.wav')
 		self.death_sound = pygame.mixer.Sound(os.getcwd() + '/music/death.wav')
+		self.giantSpike = giantSpike
 
 	def update(self):
 		if not self.start_tick is None:
@@ -115,7 +116,20 @@ class player(Sprite):
 		elevator_hit_list = spritecollide(self, self.elevator, False)
 		for each in elevator_hit_list:
 			if self.rect.bottom >= each.rect.top:
+				print('Speed' + str(self.ySpeed))
 				self.ySpeed = each.speed
+
+		giantSpike_hit_list = spritecollide(self, self.giantSpike, False)
+		if len(giantSpike_hit_list) > 0 and self.unhurtful == False:
+			self.start_tick = get_ticks()
+			self._updateSprite()
+			self.hp -= 90
+			if self.hp <= 0:
+				#Dead
+				pass
+			else:
+				self.unhurtful = True
+
 
 	def _updateSprite(self):
 		if self.spriteCount == 3:
