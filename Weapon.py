@@ -82,7 +82,9 @@ class Weapon(Sprite):
 
 		bullet_up.y = 1
 		bullet_down.y = -1
-		self.shootingBullets.add((bullet, bullet_up, bullet_down))
+		self.shootingBullets.add(bullet)
+		self.shootingBullets.add(bullet_up)
+		self.shootingBullets.add( bullet_down)
 		return (bullet, bullet_up, bullet_down)
 
 
@@ -127,7 +129,7 @@ class shotgun(Weapon):
 		super().__init__(image = name, direction = direction)
 
 	def shoot(self):
-		if len(self.shootingBullets) < 1:
+		if len(self.shootingBullets) < 3:
 			return super().shootshot()
 
 	def changeDirection(self, direction):

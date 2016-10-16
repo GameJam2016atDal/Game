@@ -111,9 +111,9 @@ class game:
 		currentTime = get_ticks()
 		if not self.weakLayerBrokenTime is None and (currentTime - self.weakLayerBrokenTime) / 1000 > 10:
 			self._generateWeakLayer()
-			for each in playerList:
+			for each in self.playerList:
 				try:
-					each.weakLayer = self.weakLayer
+					each.weakLayer = self.weakLayerGroup
 				except:
 					pass
 
@@ -125,10 +125,11 @@ class game:
 
 			if isinstance(each, shotgunShell):
 				if each.outOfRange():
+
 					self.bulletList.remove(each)
 					for eachPlayer in self.playerList:
 						try:
-							#print(eachPlayer.shootingBullets)
+							print("out of range")
 							eachPlayer.shootingBullets.remove(each)
 						except:
 							pass
@@ -168,6 +169,7 @@ class game:
 					self.bulletList.remove(each)
 					for eachPlayer in self.playerList:
 						try:
+							print("hit block")
 							eachPlayer.shootingBullets.remove(each)
 						except:
 							pass
@@ -175,6 +177,7 @@ class game:
 				self.bulletList.remove(each)
 				for eachPlayer in self.playerList:
 					try:
+						print("out of bounds")
 						eachPlayer.shootingBullets.remove(each)
 					except:
 						pass
@@ -247,6 +250,24 @@ class game:
 						self.Player.go_left()
 					if event.key == pygame.K_RIGHT:
 						self.Player.go_right()
+					if event.key == pygame.K_1:
+						self.playerList.remove(self.Player.weapon)
+						self.Player.weapon = Weapon.machineGun(1)
+						self.Player.weapon.rect.x = self.Player.rect.x + 50
+						self.Player.weapon.update()
+						self.playerList.add(self.Player.weapon)
+					if event.key == pygame.K_2:
+						self.playerList.remove(self.Player.weapon)
+						self.Player.weapon = Weapon.grenade_launcher(direction = 1)
+						self.Player.weapon.rect.x = self.Player.rect.x + 50
+						self.Player.weapon.update()
+						self.playerList.add(self.Player.weapon)
+					if event.key == pygame.K_3:
+						self.playerList.remove(self.Player.weapon)
+						self.Player.weapon = Weapon.shotgun(direction = 1)
+						self.Player.weapon.rect.x = self.Player.rect.x + 50
+						self.Player.weapon.update()
+						self.playerList.add(self.Player.weapon)
 					if event.key == pygame.K_UP:
 						self.Player.jump()
 					if event.key == pygame.K_SPACE:
