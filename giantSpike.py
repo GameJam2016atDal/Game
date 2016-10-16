@@ -16,9 +16,12 @@ class giantSpike(Sprite):
 		self.currentTime = None
 		self.moveUp = False
 		self.plat = None
+		self.chain = chain()
+		self.chain.rect.x, self.chain.rect.y = self.rect.x + 10, self.rect.y - 680
 
 	def update(self):
 		self.plat.rect.x, self.plat.rect.y = self.rect.x + 10, self.rect.y - 7
+		self.chain.rect.x, self.chain.rect.y = self.rect.x + 10, self.rect.y - 680
 		if self.movable == False:
 			return
 		if self.rect.y <= 700 and self.moveUp == False:
@@ -37,3 +40,9 @@ class giantSpike(Sprite):
 					self.moveUp = False
 					self.movable = False
 					self.plat.speed = 0
+
+class chain(Sprite):
+	def __init__(self):
+		super().__init__()
+		self.image = load(os.getcwd() + '/img/chain.png')
+		self.rect = self.image.get_rect()

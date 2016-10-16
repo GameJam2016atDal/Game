@@ -54,7 +54,6 @@ class Weapon(Sprite):
 		self.shootingBullets.add(grenade)
 		return grenade
 
-
 class grenade_launcher(Weapon):
 	def __init__(self, direction):
 		super().__init__(image = "grenade", direction = direction)
@@ -66,6 +65,10 @@ class grenade_launcher(Weapon):
 	def changeDirection(self, direction):
 		self.direction = direction
 
+	def update(self):
+		self.image = load(os.getcwd() + '/img/grenade.png')
+		self.shootingBullets = set()
+		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/grenade.wav')
 
 class machineGun(Weapon):
 	def __init__(self, direction):
@@ -80,6 +83,12 @@ class machineGun(Weapon):
 		name = 'normalGun-l' if direction == -1 else 'normalGun-r'
 		self.image = load(os.getcwd() + '/img/' + name + '.png')
 		self.direction = direction
+
+	def update(self):
+		name = 'normalGun-l' if self.direction == -1 else 'normalGun-r'
+		self.image = load(os.getcwd() + '/img/' + name + '.png')
+		self.shootingBullets = set()
+		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/' + name + '.wav')
 
 class baseballBat(Weapon):
 	def __init__(self, direction):

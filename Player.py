@@ -21,7 +21,7 @@ class player(Sprite):
 		self.weakLayer = weakLayer
 		self.bulletList = bulletList
 		self.hp = 100
-		self.weapon = Weapon.grenade_launcher(direction = 1)
+		self.weapon = Weapon.machineGun(direction = 1)
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 		self.unhurtful = False # When player is hit, there are 1 sec for him to be unhurtful
 		self.start_tick = None
@@ -31,6 +31,7 @@ class player(Sprite):
 		self.giantSpike = giantSpike
 
 	def update(self):
+
 		if not self.start_tick is None:
 			currentTime = get_ticks()
 			if self.hp > 0:
@@ -62,6 +63,7 @@ class player(Sprite):
 		elif move < -4:
 			move = -4
 		self.rect.x += move
+		self.weapon.update()
 		self.weapon.rect.y = self.rect.y + 50
 		if self.direction == 1:
 			self.weapon.rect.x = self.rect.x + 20
@@ -77,6 +79,9 @@ class player(Sprite):
 			elif self.ySpeed < 0:
 				self.rect.top = each.rect.bottom
 			self.ySpeed = 0
+
+		block_hit_list = spritecollide(self, self.platforms, False)
+		self._preventMoving(block_hit_list)
 
 		self.rect.y += self.ySpeed
 		block_hit_list = spritecollide(self, self.platforms, False)
@@ -120,15 +125,16 @@ class player(Sprite):
 				self.ySpeed = each.speed
 
 		giantSpike_hit_list = spritecollide(self, self.giantSpike, False)
-		if len(giantSpike_hit_list) > 0 and self.unhurtful == False:
-			self.start_tick = get_ticks()
-			self._updateSprite()
-			self.hp -= 90
-			if self.hp <= 0:
-				#Dead
-				pass
-			else:
-				self.unhurtful = True
+		for each in giantSpike_hit_list:
+			if each.rect.bottom >= self.rect.top and self.unhurtful == False:
+				self.start_tick = get_ticks()
+				self._updateSprite()
+				self.hp -= 90
+				if self.hp <= 0:
+					#Dead
+					pass
+				else:
+					self.unhurtful = True
 
 
 	def _updateSprite(self):

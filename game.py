@@ -11,6 +11,7 @@ from random import randint
 from Grenade import Grenade
 from pygame.time import get_ticks
 from giantSpike import giantSpike
+from Weapon import *
 
 class game:
 	def __init__(self, screenSize, fullScreen = False, backgroundColour = (249, 250, 255)):
@@ -26,6 +27,7 @@ class game:
 		self._generateWeakLayer()
 		self._generateGiantSpike()
 		self.bulletList = pygame.sprite.Group()
+		self.weakLayerBrokenTime = None
 		try:
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socket.bind(('0.0.0.0', 7777))
@@ -41,6 +43,8 @@ class game:
 		self.giantSpikePlat.rect.x, self.giantSpikePlat.rect.y = self.giantSpike.rect.x + 10, self.giantSpike.rect.y - 5
 		self.giantSpike.plat = self.giantSpikePlat
 		self.elevatorList.add(self.giantSpikePlat)
+		self.chainGroup = pygame.sprite.Group()
+		self.chainGroup.add(self.giantSpike.chain)
 
 	def _generatePlatform(self):
 		self.platformList = pygame.sprite.Group()
@@ -94,6 +98,10 @@ class game:
 		self.elevatorList.update()
 		self.elevatorList.draw(self.screen)
 
+		currentTime = get_ticks()
+		if not self.weakLayerBrokenTime is None and (currentTime - self.weakLayerBrokenTime) / 1000 > 10:
+			self._generateWeakLayer()
+
 		for each in self.elevators:
 			if each.rect.x != 630:
 				each.move()
@@ -114,6 +122,7 @@ class game:
 
 			weak_hit_list = pygame.sprite.spritecollide(each, self.weakLayerGroup, True)
 			if len(weak_hit_list) > 0:
+				self.weakLayerBrokenTime = get_ticks()
 				self.bulletList.remove(each)
 				for eachPlayer in self.playerList:
 					try:
@@ -146,6 +155,10 @@ class game:
 						pass
 
 		weak_hit_list = pygame.sprite.spritecollide(self.giantSpike, self.weakLayerGroup, True)
+		if len(weak_hit_list) > 0:
+			self.weakLayerBrokenTime = get_ticks()
+		# if self.giantSpike.moveUp == False and self.giantSpike.movable == False and len(self.weakLayerGroup) == 0:
+		# 	self._generateWeakLayer()
 
 		self.bulletList.update()
 		self.bulletList.draw(self.screen)
@@ -157,6 +170,8 @@ class game:
 		self.weakLayerGroup.draw(self.screen)
 		self.giantSpikeList.update()
 		self.giantSpikeList.draw(self.screen)
+		self.chainGroup.update()
+		self.chainGroup.draw(self.screen)
 		pygame.display.flip()
 
 	def start(self):
@@ -200,6 +215,19 @@ class game:
 						bullet = self.Player.weapon.shoot()
 						if not bullet is None:
 							self.bulletList.add(bullet)
+					if event.key == pygame.K_1:
+						self.playerList.remove(self.Player.weapon)
+						self.Player.weapon = Weapon.machineGun(1)
+						self.Player.weapon.rect.x = self.Player.rect.x + 50
+						self.Player.weapon.update()
+						self.playerList.add(self.Player.weapon)
+					if event.key == pygame.K_2:
+						self.playerList.remove(self.Player.weapon)
+						self.Player.weapon = Weapon.grenade_launcher(direction = 1)
+						self.Player.weapon.rect.x = self.Player.rect.x + 50
+						self.Player.weapon.update()
+						self.playerList.add(self.Player.weapon)
+
 				if event.type == pygame.KEYUP:
 					if event.key == pygame.K_LEFT and self.Player.xSpeed < 0:
 						self.Player.stop()
