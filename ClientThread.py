@@ -24,9 +24,10 @@ class ClientThread(Thread):
 			if data == b'2':
 				self.player.go_right()
 			if data == b'3':
-				bullet = self.player.weapon.shoot()
-				if not bullet is None:
-					self.bulletList.add(bullet)
+				if self.player.dead == False:
+					bullet = self.player.weapon.shoot()
+					if not bullet is None:
+						self.bulletList.add(bullet)
 			if data == b'4':
 				self.player.stop()
 			if data.endswith(b'4'):
@@ -40,6 +41,12 @@ class ClientThread(Thread):
 			if data == b'6':
 				self.playerList.remove(self.player.weapon)
 				self.player.weapon = Weapon.grenade_launcher(direction = 1)
+				self.player.weapon.rect.x = self.player.rect.x + 50
+				self.player.weapon.update()
+				self.playerList.add(self.player.weapon)
+			if data == b'7':
+				self.playerList.remove(self.player.weapon)
+				self.player.weapon = Weapon.shotgun(direction = 1)
 				self.player.weapon.rect.x = self.player.rect.x + 50
 				self.player.weapon.update()
 				self.playerList.add(self.player.weapon)

@@ -5,6 +5,7 @@ import pygame
 from pygame.time import get_ticks
 from Weapon import *
 from random import randint
+from shotgunShell import *
 
 class player(Sprite):
 	def __init__(self, character, platforms, elevator, weakLayer, bulletList, sticks, giantSpike):
@@ -30,6 +31,7 @@ class player(Sprite):
 		self.death_sound = pygame.mixer.Sound(os.getcwd() + '/music/death.wav')
 		self.giantSpike = giantSpike
 		self.playerList = None
+		self.dead = False
 
 	def update(self):
 
@@ -42,15 +44,17 @@ class player(Sprite):
 					self._updateSprite()
 			else:
 				if (currentTime - self.start_tick) / 1000 > 5:
-					initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
+					self.dead = False
+					initialLocations = [(968, 300), (968, 400), (280, 400), (968, 250), (280, 250)]
 					self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/' + self.spriteName + '-r1.png')
-					initialLocation = initialLocations[randint(0, 3)]
+					initialLocation = initialLocations[randint(0, 4)]
 					self.rect.x, self.rect.y = initialLocation
 					self.weapon.rect.x, self.weapon.rect.y = self.rect.x, self.rect.y
 					self.hp = 100
 				else:
 					self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/d.png')
 					self.weapon.rect.right = self.rect.left
+					self.dead = True
 					return
 		self._updateSprite()
 		self.calc_grav()
@@ -111,7 +115,10 @@ class player(Sprite):
 			if self.unhurtful == False :
 				self.start_tick = get_ticks()
 				self._updateSprite()
-				self.hp -= 20
+				if isinstance(each, shotgunShell):
+					self.hp -= 40
+				else:
+					self.hp -= 20
 				self.hit_sound.play()
 				if self.hp <= 0:
 					#death
