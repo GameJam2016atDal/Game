@@ -121,10 +121,8 @@ class player(Sprite):
 
 		elevator_hit_list = spritecollide(self, self.elevator, False)
 		for each in elevator_hit_list:
-			if self.rect.bottom < each.rect.top:
+			if self.rect.bottom > each.rect.top:
 				self.ySpeed = each.speed
-			else:
-				self.rect.bottom = each.rect.top
 
 		giantSpike_hit_list = spritecollide(self, self.giantSpike, False)
 		for each in giantSpike_hit_list:
@@ -197,7 +195,7 @@ class player(Sprite):
 	def stop(self):
 		self.direction = 0
 		self.spriteCount = 0
-		
+
 	def _sliding(self):
 		slidingRatio = 0.15
 		maxSpeed = 4
