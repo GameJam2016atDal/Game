@@ -8,6 +8,8 @@ from Elevator import Elevator
 from weakLayer import weakLayer
 from random import randint
 from Grenade import Grenade
+from pygame.time import get_ticks
+from giantSpike import giantSpike
 
 class game:
 	def __init__(self, screenSize, fullScreen = False, backgroundColour = (249, 250, 255)):
@@ -21,12 +23,23 @@ class game:
 		self._generateSticks()
 		self._generateElevators()
 		self._generateWeakLayer()
+		self._generateGiantSpike()
 		self.bulletList = pygame.sprite.Group()
 		try:
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socket.bind(('0.0.0.0', 7777))
 		except:
 			print('Connection Error')
+	
+	def _generateGiantSpike(self):
+		self.giantSpike = giantSpike()
+		self.giantSpikeList = pygame.sprite.Group()
+		self.giantSpikeList.add(self.giantSpike)
+		self.giantSpikePlat = Elevator('elevator')
+		self.giantSpikePlat.speed = 0
+		self.giantSpikePlat.rect.x, self.giantSpikePlat.rect.y = self.giantSpike.rect.x + 10, self.giantSpike.rect.y - 5
+		self.giantSpike.plat = self.giantSpikePlat
+		self.elevatorList.add(self.giantSpikePlat)
 
 	def _generatePlatform(self):
 		self.platformList = pygame.sprite.Group()
@@ -63,7 +76,7 @@ class game:
 		# self.playerList.add(Player.weapon)
 		# return Player
 
-		self.Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList)
+		self.Player = player(platforms = self.platformList, elevator = self.elevatorList, weakLayer = self.weakLayerGroup, bulletList = self.bulletList, sticks = self.stickList, giantSpike = self.giantSpikeList)
 		initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
 		initialLocation = initialLocations[randint(0, 3)]
 		self.Player.rect.x, self.Player.rect.y = initialLocation
@@ -81,9 +94,23 @@ class game:
 		self.elevatorList.draw(self.screen)
 
 		for each in self.elevators:
-			each.move()
+			if each.rect.x != 630:
+				each.move()
 		for each in self.bulletList:
 			each.move()
+
+			giantSpike_hit_list = pygame.sprite.spritecollide(each, self.giantSpikeList, False)
+			if len(giantSpike_hit_list) > 0:
+				self.bulletList.remove(each)
+				for eachPlayer in self.playerList:
+					try:
+						eachPlayer.shootingBullets.remove(each)
+					except:
+						pass
+				if self.giantSpike.moveUp == False:
+					self.giantSpike.startTime = get_ticks()
+					self.giantSpike.movable = True
+
 			weak_hit_list = pygame.sprite.spritecollide(each, self.weakLayerGroup, True)
 			if len(weak_hit_list) > 0:
 				self.bulletList.remove(each)
@@ -117,6 +144,8 @@ class game:
 					except:
 						pass
 
+		weak_hit_list = pygame.sprite.spritecollide(self.giantSpike, self.weakLayerGroup, True)
+
 		self.bulletList.update()
 		self.bulletList.draw(self.screen)
 		self.playerList.update()
@@ -125,6 +154,8 @@ class game:
 		self.stickList.draw(self.screen)
 		self.weakLayerGroup.update()
 		self.weakLayerGroup.draw(self.screen)
+		self.giantSpikeList.update()
+		self.giantSpikeList.draw(self.screen)
 		pygame.display.flip()
 
 	def start(self):

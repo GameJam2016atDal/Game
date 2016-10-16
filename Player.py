@@ -6,7 +6,7 @@ from Weapon import *
 from random import randint
 
 class player(Sprite):
-	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks):
+	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks, giantSpike):
 		super().__init__()
 		self.spriteName = 'b'
 		self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/' + self.spriteName + '-r1.png')
@@ -24,6 +24,7 @@ class player(Sprite):
 		self.unhurtful = False # When player is hit, there are 1 sec for him to be unhurtful
 		self.start_tick = None
 		self.spriteCount = 0
+		self.giantSpike = giantSpike
 
 	def update(self):
 		if not self.start_tick is None:
@@ -109,7 +110,20 @@ class player(Sprite):
 		elevator_hit_list = spritecollide(self, self.elevator, False)
 		for each in elevator_hit_list:
 			if self.rect.bottom >= each.rect.top:
+				print('Speed' + str(self.ySpeed))
 				self.ySpeed = each.speed
+
+		giantSpike_hit_list = spritecollide(self, self.giantSpike, False)
+		if len(giantSpike_hit_list) > 0 and self.unhurtful == False:
+			self.start_tick = get_ticks()
+			self._updateSprite()
+			self.hp -= 90
+			if self.hp <= 0:
+				#Dead
+				pass
+			else:
+				self.unhurtful = True
+
 
 	def _updateSprite(self):
 		if self.spriteCount == 3:
