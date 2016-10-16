@@ -11,6 +11,7 @@ from random import randint
 from Grenade import Grenade
 from pygame.time import get_ticks
 from giantSpike import giantSpike
+from shotgunShell import shotgunShell
 
 class game:
 	def __init__(self, screenSize, fullScreen = False, backgroundColour = (249, 250, 255)):
@@ -100,6 +101,16 @@ class game:
 		for each in self.bulletList:
 			each.move()
 
+			if isinstance(each, shotgunShell):
+				if each.outOfRange():
+					self.bulletList.remove(each)
+					for eachPlayer in self.playerList:
+						try:
+							#print(eachPlayer.shootingBullets)
+							eachPlayer.shootingBullets.remove(each)
+						except:
+							pass
+
 			giantSpike_hit_list = pygame.sprite.spritecollide(each, self.giantSpikeList, False)
 			if len(giantSpike_hit_list) > 0:
 				self.bulletList.remove(each)
@@ -187,6 +198,15 @@ class game:
 					self.gaming = False
 					break
 				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_BACKSPACE:
+
+						for eachPlayer in self.playerList:
+							try:
+								print(len(eachPlayer.shootingBullets))
+								print(eachPlayer.shootingBullets)
+							except:
+								pass
+						
 					if event.key == pygame.K_ESCAPE:
 						self.gaming = False
 						break
