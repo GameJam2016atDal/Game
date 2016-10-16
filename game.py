@@ -107,9 +107,9 @@ class game:
 		currentTime = get_ticks()
 		if not self.weakLayerBrokenTime is None and (currentTime - self.weakLayerBrokenTime) / 1000 > 10:
 			self._generateWeakLayer()
-			for each in self.playerList:
+			for each in playerList:
 				try:
-					each.weakLayer = self.weakLayerGroup
+					each.weakLayer = self.weakLayer
 				except:
 					pass
 
@@ -168,6 +168,8 @@ class game:
 		weak_hit_list = pygame.sprite.spritecollide(self.giantSpike, self.weakLayerGroup, True)
 		if len(weak_hit_list) > 0:
 			self.weakLayerBrokenTime = get_ticks()
+		# if self.giantSpike.moveUp == False and self.giantSpike.movable == False and len(self.weakLayerGroup) == 0:
+		# 	self._generateWeakLayer()
 
 		self.bulletList.update()
 		self.bulletList.draw(self.screen)

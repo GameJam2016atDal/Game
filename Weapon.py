@@ -3,6 +3,7 @@ from pygame.sprite import Sprite
 from pygame.image import load
 from Bullet import Bullet
 from Grenade import Grenade
+from shotgunShell import shotgunShell
 import os
 
 class Weapon(Sprite):
@@ -31,6 +32,11 @@ class Weapon(Sprite):
 		gun = machineGun(direction)
 		return gun
 
+	@staticmethod
+	def shotgun(direction):
+		sg = shotgun(direction)
+		return sg
+
 	def shoot(self):
 		self.sound.play()
 		bullet = Bullet(self.direction)
@@ -52,6 +58,32 @@ class Weapon(Sprite):
 			grenade.rect.right = self.rect.left
 		self.shootingBullets.add(grenade)
 		return grenade
+
+	def shootshot(self): # if you know how to duplicate objects in python you can cut this code back lol
+		self.sound.play()
+		bullet = shotgunShell(self.direction)
+		bullet_up = shotgunShell(self.direction)
+		bullet_down = shotgunShell(self.direction)
+
+		bullet.rect.x, bullet.rect.y = self.rect.x, self.rect.y
+		bullet_up.rect.x, bullet_up.rect.y = self.rect.x, self.rect.y
+		bullet_down.rect.x, bullet_down.rect.y = self.rect.x, self.rect.y
+
+		if self.direction > 0:
+			bullet.rect.left = self.rect.right
+			bullet_up.rect.left = self.rect.right
+			bullet_down.rect.left = self.rect.right
+		else:
+			bullet.rect.right = self.rect.left
+			bullet_up.rect.right = self.rect.left
+			bullet_down.rect.right = self.rect.left
+
+
+		bullet_up.y = 1
+		bullet_down.y = -1
+		self.shootingBullets.add((bullet, bullet_up, bullet_down))
+		return (bullet, bullet_up, bullet_down)
+
 
 class grenade_launcher(Weapon):
 	def __init__(self, direction):
@@ -84,6 +116,25 @@ class machineGun(Weapon):
 
 	def update(self):
 		name = 'normalGun-l' if self.direction == -1 else 'normalGun-r'
+		self.image = load(os.getcwd() + '/img/' + name + '.png')
+		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/' + name + '.wav')
+
+class shotgun(Weapon):
+	def __init__(self, direction):
+		name = 'shotgun-l' if direction == -1 else 'shotgun-r'
+		super().__init__(image = name, direction = direction)
+
+	def shoot(self):
+		if len(self.shootingBullets) < 1:
+			return super().shootshot()
+
+	def changeDirection(self, direction):
+		name = 'shotgun-l' if direction == -1 else 'shotgun-r'
+		self.image = load(os.getcwd() + '/img/' + name + '.png')
+		self.direction = direction
+
+	def update(self):
+		name = 'shotgun-l' if self.direction == -1 else 'shotgun-r'
 		self.image = load(os.getcwd() + '/img/' + name + '.png')
 		self.sound = pygame.mixer.Sound(os.getcwd() + '/music/' + name + '.wav')
 

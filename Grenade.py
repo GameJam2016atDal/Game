@@ -15,7 +15,6 @@ class Grenade(Bullet):
         self.bounced = False
         self.direction = direction#1 for right, -1 for left
 
-
     def move(self):
         if not self.bounced:
             if not self.initial_y:
