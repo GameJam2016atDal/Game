@@ -8,7 +8,7 @@ from random import randint
 class player(Sprite):
 	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks):
 		super().__init__()
-		self.spriteName = 'a'
+		self.spriteName = 'b'
 		self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/' + self.spriteName + '-r1.png')
 		self.rect = self.image.get_rect()
 		self.xSpeed = 0
@@ -36,12 +36,14 @@ class player(Sprite):
 			else:
 				if (currentTime - self.start_tick) / 1000 > 5:
 					initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
+					self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/' + self.spriteName + '-r1.png')
 					initialLocation = initialLocations[randint(0, 3)]
 					self.rect.x, self.rect.y = initialLocation
+					self.weapon.rect.x, self.weapon.rect.y = self.rect.x, self.rect.y
 					self.hp = 100
 				else:
-					self.rect.x, self.rect.y = (-100, -100)
-					self.weapon.rect.x, self.weapon.rect.y = (-100, -100)
+					self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/d.png')
+					self.weapon.rect.right = self.rect.left
 					return
 		self._updateSprite()
 		self.calc_grav()
@@ -63,8 +65,6 @@ class player(Sprite):
 		self.weapon.rect.x += move
 		self.weapon.update()
 
-		block_hit_list = spritecollide(self, self.platforms, False)
-		self._preventMoving(block_hit_list)
 		weakLayer_list = spritecollide(self, self.weakLayer, False)
 		for each in weakLayer_list:
 			if self.ySpeed > 0:
@@ -90,8 +90,7 @@ class player(Sprite):
 				self.hp -= 10
 				if self.hp <= 0:
 					#Dead
-					self.rect.x, self.rect.y = -100, -100
-					self.weapon.rect.x, self.weapon.rect.y = (-100, -100)
+					pass
 				else:
 					self.unhurtful = True
 
@@ -103,8 +102,7 @@ class player(Sprite):
 				self.hp -= 20
 				if self.hp <= 0:
 					#Dead
-					self.rect.x, self.rect.y = -100, -100
-					self.weapon.rect.x, self.weapon.rect.y = (-100, -100)
+					pass
 				else:
 					self.unhurtful = True
 

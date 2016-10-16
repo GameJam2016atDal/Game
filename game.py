@@ -109,10 +109,6 @@ class game:
 							eachPlayer.shootingBullets.remove(each)
 						except:
 							pass
-
-
-
-
 			if each.rect.right >= 1440 or each.rect.left <= 0:
 				self.bulletList.remove(each)
 				for eachPlayer in self.playerList:
