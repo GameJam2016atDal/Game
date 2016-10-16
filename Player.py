@@ -1,5 +1,6 @@
 from pygame.sprite import Sprite, spritecollide
-from pygame import Surface
+from pygame.image import load
+import os
 from pygame.time import get_ticks
 from Weapon import *
 from random import randint
@@ -7,8 +8,8 @@ from random import randint
 class player(Sprite):
 	def __init__(self, platforms, elevator, weakLayer, bulletList, sticks):
 		super().__init__()
-		self.image = Surface([50, 100])
-		self.image.fill((0, 255, 0))
+		self.spriteName = 'a'
+		self.image = load(os.getcwd() + '/img/sprite-' + self.spriteName + '/' + self.spriteName + '-r1.png')
 		self.rect = self.image.get_rect()
 		self.xSpeed = 0
 		self.ySpeed = 0
@@ -22,6 +23,7 @@ class player(Sprite):
 		self.direction = 0 # 0 for stop, 1 for right, -1 for left
 		self.unhurtful = False # When player is hit, there are 1 sec for him to be unhurtful
 		self.start_tick = None
+		self.spriteCount = 0
 
 	def update(self):
 		if not self.start_tick is None:
@@ -29,7 +31,8 @@ class player(Sprite):
 			if self.hp > 0:
 				if (currentTime - self.start_tick) / 1000 > 1:
 					self.unhurtful = False
-					self.image.fill((0, 255, 0))
+					# Revert back
+					self._updateSprite()
 			else:
 				if (currentTime - self.start_tick) / 1000 > 5:
 					initialLocations = [(968, 400), (280, 400), (968, 250), (280, 250)]
@@ -40,6 +43,7 @@ class player(Sprite):
 					self.rect.x, self.rect.y = (-100, -100)
 					self.weapon.rect.x, self.weapon.rect.y = (-100, -100)
 					return
+		self._updateSprite()
 		self.calc_grav()
 		if self.rect.right > 1440:
 			self.rect.right = 1440
@@ -51,7 +55,11 @@ class player(Sprite):
 		elif move < -4:
 			move = -4
 		self.rect.x += move
-		self.weapon.rect.x, self.weapon.rect.y = self.rect.x, self.rect.y
+		self.weapon.rect.y = self.rect.y + 50
+		if self.direction == 1:
+			self.weapon.rect.x = self.rect.x + 20
+		elif self.direction == -1:
+			self.weapon.rect.x = self.rect.x - 30
 		self.weapon.rect.x += move
 		self.weapon.update()
 
@@ -78,7 +86,7 @@ class player(Sprite):
 		if len(sticks_hit_list) > 0:
 			if self.unhurtful == False:
 				self.start_tick = get_ticks()
-				self.image.fill((0, 0, 0))
+				self._updateSprite()
 				self.hp -= 10
 				if self.hp <= 0:
 					#Dead
@@ -91,7 +99,7 @@ class player(Sprite):
 		for each in bullet_hit_list:
 			if self.unhurtful == False :
 				self.start_tick = get_ticks()
-				self.image.fill((0, 0, 0))
+				self._updateSprite()
 				self.hp -= 20
 				if self.hp <= 0:
 					#Dead
@@ -104,6 +112,24 @@ class player(Sprite):
 		for each in elevator_hit_list:
 			if self.rect.bottom >= each.rect.top:
 				self.ySpeed = each.speed
+
+	def _updateSprite(self):
+		if self.spriteCount == 3:
+			self.spriteCount = 0
+		pic = os.getcwd() + '/img/sprite-'
+		pic += self.spriteName + '/' + self.spriteName + '-'
+		if self.direction == 1:
+			pic += 'r'
+		elif self.direction == -1:
+			pic += 'l'
+		else:
+			return
+		pic += str(self.spriteCount)
+		if self.unhurtful == True:
+			pic += 'h'
+		pic += '.png'
+		self.spriteCount += 1
+		self.image = load(pic)
 
 	def _preventMoving(self, obstacle):
 		for each in obstacle:
@@ -141,6 +167,7 @@ class player(Sprite):
 
 	def stop(self):
 		self.direction = 0
+		self.spriteCount = 0
 
 	def _sliding(self):
 		slidingRatio = 0.15
